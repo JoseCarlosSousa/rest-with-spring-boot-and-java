@@ -1,4 +1,6 @@
 package pt.seixal.carlos.exceptions;
 
-public record ExceptionResponse() {
+import java.util.Date;
+
+public record ExceptionResponse(Date timeStamp, String message, String details) {
 }
