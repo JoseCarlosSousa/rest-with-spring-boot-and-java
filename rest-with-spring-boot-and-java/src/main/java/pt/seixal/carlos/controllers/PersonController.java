@@ -8,10 +8,11 @@ import pt.seixal.carlos.data.dto.v2.PersonDTOV2;
 import pt.seixal.carlos.services.PersonService;
 import pt.seixal.carlos.data.dto.v1.PersonDTO;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/person")
+@RequestMapping("/api/person/v1")
 public class PersonController {
 
     @Autowired
@@ -25,7 +26,13 @@ public class PersonController {
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public PersonDTO findById(@PathVariable("id") Long id) {
-        return service.findById(id);
+
+        var person = service.findById(id);
+        person.setBirthDate(new Date());
+        person.setPhoneNumber("");
+        person.setLastName(null);
+        person.setSensitiveData("não é para ver");
+        return person;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
