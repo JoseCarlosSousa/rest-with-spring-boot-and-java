@@ -1,1 +1,11 @@
-spring.application.name=rest-with-spring-boot-and-java.git
+spring:
+  application:
+    name: rest-with-spring-boot-and-java
+  datasource:
+    url: jdbc:mysql://localhost:3306/spring_boot_starter_data_jpa?useTimezone=true&serverTimezone=UTC
+    username: root
+    password: rootroot
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
