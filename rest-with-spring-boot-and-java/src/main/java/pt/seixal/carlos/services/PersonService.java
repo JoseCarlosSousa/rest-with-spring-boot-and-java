@@ -4,12 +4,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pt.seixal.carlos.data.dto.v1.PersonDTO;
+import pt.seixal.carlos.data.dto.v2.PersonDTOV2;
 import pt.seixal.carlos.exceptions.ResourceNotFoundException;
+import pt.seixal.carlos.mapper.custom.PersonMapper;
 import pt.seixal.carlos.model.Person;
 import pt.seixal.carlos.repository.PersonRepository;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static pt.seixal.carlos.mapper.ObjectMapper.parseListObjects;
+import static pt.seixal.carlos.mapper.ObjectMapper.parseObject;
 
 @Service
 public class PersonService {
@@ -19,32 +25,39 @@ public class PersonService {
 
     @Autowired
     PersonRepository repository;
+    @Autowired
+    PersonMapper mapper;
 
-    public List<Person> findAll() {
+    public List<PersonDTO> findAll() {
         logger.info("Finding all people!");
-        return repository.findAll();
+        return parseListObjects(repository.findAll(), PersonDTO.class);
     }
 
-    public Person findById(Long id) {
+    public PersonDTO findById(Long id) {
         logger.info("Finding one Person!");
-        return getPerson(id);
+        return parseObject(getPerson(id), PersonDTO.class);
     }
 
-    public Person create(Person person) {
+    public PersonDTO create(PersonDTO person) {
         logger.info("Creating Person");
 
-        return repository.save(person);
+        var entity = parseObject(person, Person.class);
+        return parseObject(repository.save(entity), PersonDTO.class);
+    }
+
+    public PersonDTOV2 createV2(PersonDTOV2 person) {
+        logger.info("Creating PersonV2");
+
+        var entity = mapper.convertDTOToEntity(person);
+        return mapper.convertEntityToDTO(repository.save(entity));
     }
 
     private Person getPerson(Long id) {
         logger.info("Getting Person with id: {}", id);
-        return repository.findById(id).orElseThrow(() -> {
-            logger.error("Person not found with id: {}", id);
-            return new ResourceNotFoundException("No record found for this id");
-        });
+        return repository.findById(id).orElseThrow(() ->  new ResourceNotFoundException("No record found for this id"));
     }
 
-    public Person update(Person person) {
+    public PersonDTO update(PersonDTO person) {
         logger.info("Edit Person");
 
         Person entity = getPerson(person.getId());
@@ -53,13 +66,13 @@ public class PersonService {
         entity.setAddress(person.getAddress());
         entity.setGender(person.getGender());
 
-        return repository.save(entity);
+        return parseObject(repository.save(entity), PersonDTO.class);
     }
 
     public void delete(Long id) {
         logger.info("delete Person");
 
-        Person entity = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No record found for this id"));
+        var entity = getPerson(id);
 
         repository.delete(entity);
     }
