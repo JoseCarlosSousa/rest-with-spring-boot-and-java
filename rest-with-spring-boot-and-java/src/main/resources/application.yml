@@ -9,3 +9,8 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+    open-in-view: false
+logging:
+  level:
+    #root: WARN
+    pt.seixal.carlos: DEBUG

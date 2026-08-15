@@ -1,5 +1,7 @@
 package pt.seixal.carlos.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pt.seixal.carlos.exceptions.ResourceNotFoundException;
@@ -8,13 +10,12 @@ import pt.seixal.carlos.repository.PersonRepository;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Logger;
 
 @Service
 public class PersonService {
 
     private final AtomicLong counter = new AtomicLong();
-    private final Logger logger = Logger.getLogger(PersonService.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(PersonService.class.getName());
 
     @Autowired
     PersonRepository repository;
@@ -26,7 +27,7 @@ public class PersonService {
 
     public Person findById(Long id) {
         logger.info("Finding one Person!");
-        return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No record found for this id"));
+        return getPerson(id);
     }
 
     public Person create(Person person) {
@@ -35,10 +36,18 @@ public class PersonService {
         return repository.save(person);
     }
 
+    private Person getPerson(Long id) {
+        logger.info("Getting Person with id: {}", id);
+        return repository.findById(id).orElseThrow(() -> {
+            logger.error("Person not found with id: {}", id);
+            return new ResourceNotFoundException("No record found for this id");
+        });
+    }
+
     public Person update(Person person) {
         logger.info("Edit Person");
 
-        Person entity = repository.findById(person.getId()).orElseThrow(() -> new ResourceNotFoundException("No record found for this id"));
+        Person entity = getPerson(person.getId());
         entity.setFirstName(person.getFirstName());
         entity.setLastName(person.getLastName());
         entity.setAddress(person.getAddress());
