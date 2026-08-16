@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.Objects;
 
 @JsonPropertyOrder({"id", "gender", "firstName", "lastName", "address"})
-@JsonFilter("personFilter")
+//@JsonFilter("personFilter") error on WebConfig with this annotation
 public class PersonDTO implements Serializable {
 
 
