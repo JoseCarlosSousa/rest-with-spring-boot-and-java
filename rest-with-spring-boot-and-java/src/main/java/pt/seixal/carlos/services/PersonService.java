@@ -13,7 +13,6 @@ import pt.seixal.carlos.model.Person;
 import pt.seixal.carlos.repository.PersonRepository;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -23,7 +22,6 @@ import static pt.seixal.carlos.mapper.ObjectMapper.parseObject;
 @Service
 public class PersonService {
 
-    private final AtomicLong counter = new AtomicLong();
     private final Logger logger = LoggerFactory.getLogger(PersonService.class.getName());
 
     @Autowired
