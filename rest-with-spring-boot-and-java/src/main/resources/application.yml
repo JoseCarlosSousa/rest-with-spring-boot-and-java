@@ -15,5 +15,10 @@ spring:
     open-in-view: false
 logging:
   level:
-    #root: WARN
-    pt.seixal.carlos: DEBUG
+    root: INFO
+    #pt.seixal.carlos: DEBUG
+spring-doc:
+  paths-to-scan: /api/**/v1/**
+  swagger-ui:
+    use-root-path: true
+
