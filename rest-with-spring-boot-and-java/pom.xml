@@ -15,6 +15,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<dozer.version>7.0.0</dozer.version>
+		<spingdoc.version>2.7.0</spingdoc.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -28,6 +29,12 @@
 		<dependency>
 			<groupId>org.springframework.hateoas</groupId>
 			<artifactId>spring-hateoas</artifactId>
+		</dependency>
+		<!-- Source: https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>${spingdoc.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
