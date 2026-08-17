@@ -10,7 +10,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import pt.seixal.carlos.exceptions.ExceptionResponse;
 import pt.seixal.carlos.exceptions.RequiredObjectIsNullException;
 import pt.seixal.carlos.exceptions.ResourceNotFoundException;
-import pt.seixal.carlos.exceptions.UnsupportedMathOperationException;
 
 import java.util.Date;
 
@@ -21,11 +20,6 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<ExceptionResponse> handleAllExceptions(Exception ex, WebRequest request) {
         return new ResponseEntity<>(getResponse(ex, request), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(UnsupportedMathOperationException.class)
-    public final ResponseEntity<ExceptionResponse> handleBadExceptions(Exception ex, WebRequest request) {
-        return new ResponseEntity<>(getResponse(ex, request), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)

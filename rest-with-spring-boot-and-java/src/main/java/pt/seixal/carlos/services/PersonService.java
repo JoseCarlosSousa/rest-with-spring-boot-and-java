@@ -6,10 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pt.seixal.carlos.controllers.PersonController;
 import pt.seixal.carlos.data.dto.v1.PersonDTO;
-import pt.seixal.carlos.data.dto.v2.PersonDTOV2;
 import pt.seixal.carlos.exceptions.RequiredObjectIsNullException;
 import pt.seixal.carlos.exceptions.ResourceNotFoundException;
-import pt.seixal.carlos.mapper.custom.PersonMapper;
 import pt.seixal.carlos.model.Person;
 import pt.seixal.carlos.repository.PersonRepository;
 
@@ -27,8 +25,6 @@ public class PersonService {
 
     @Autowired
     PersonRepository repository;
-    @Autowired
-    PersonMapper mapper;
 
     public List<PersonDTO> findAll() {
         logger.info("Finding all people!");
@@ -52,13 +48,6 @@ public class PersonService {
         var dto = parseObject(repository.save(entity), PersonDTO.class);
         addHateoasLinks(dto);
         return dto;
-    }
-
-    public PersonDTOV2 createV2(PersonDTOV2 person) {
-        logger.info("Creating PersonV2");
-
-        var entity = mapper.convertDTOToEntity(person);
-        return mapper.convertEntityToDTO(repository.save(entity));
     }
 
     private Person getPerson(Long id) {
@@ -89,7 +78,6 @@ public class PersonService {
 
         repository.delete(entity);
     }
-
 
     private void addHateoasLinks(PersonDTO dto) {
         dto.add(linkTo(methodOn(PersonController.class).findById(dto.getId())).withSelfRel().withType("GET"));
