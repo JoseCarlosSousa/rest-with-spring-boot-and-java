@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import pt.seixal.carlos.model.Person;
 
-public class ObjectMapperTests {
+public class PersonMapperTests {
     MockPerson inputObject;
 
     @BeforeEach
