@@ -9,10 +9,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pt.seixal.carlos.data.dto.v1.PersonDTO;
+import pt.seixal.carlos.exceptions.RequiredObjectIsNullException;
 import pt.seixal.carlos.model.Person;
 import pt.seixal.carlos.repository.PersonRepository;
 import pt.seixal.carlos.unitetests.mapper.mocks.MockPerson;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,6 +40,20 @@ class PersonServiceTest {
 
     @Test
     void findAll() {
+        List<Person> list =input.mockEntityList();
+        when(repository.findAll()).thenReturn(list);
+        var persons = service.findAll();
+
+        assertNotNull(persons);
+        assertEquals(14, persons.size());
+
+        checkPersonData(persons, 1);
+        checkPersonData(persons, 4);
+    }
+
+    private void checkPersonData(List<PersonDTO> persons, int i){
+        var person = persons.get(i);
+        checkHateoasLinks(person, i);
     }
 
     @Test
@@ -45,42 +61,9 @@ class PersonServiceTest {
         Person person = input.mockEntity(1);
         person.setId(1L);
         when(repository.findById(1L)).thenReturn(Optional.of(person));
-
         var result = service.findById(1L);
 
-        assertNotNull(result);
-        assertNotNull(result.getId());
-        assertNotNull(result.getLinks());
-
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(link -> link.getRel().equals("self") &&
-                        link.getHref().endsWith("api/person/v1/1") &&
-                        link.getType().equals("GET")));
-
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(link -> link.getRel().equals("findAll") &&
-                        link.getHref().endsWith("api/person/v1") &&
-                        link.getType().equals("GET")));
-
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(link -> link.getRel().equals("create") &&
-                        link.getHref().endsWith("api/person/v1") &&
-                        link.getType().equals("POST")));
-
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(link -> link.getRel().equals("update") &&
-                        link.getHref().endsWith("api/person/v1") &&
-                        link.getType().equals("PUT")));
-
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(link -> link.getRel().equals("delete") &&
-                        link.getHref().endsWith("api/person/v1/1") &&
-                        link.getType().equals("DELETE")));
-
-        assertEquals("First Name Test1", result.getFirstName());
-        assertEquals("Last Name Test1", result.getLastName());
-        assertEquals("Address Test1", result.getAddress());
-        assertEquals("Female", result.getGender());
+        checkHateoasLinks(result, 1);
     }
 
     @Test
@@ -92,46 +75,19 @@ class PersonServiceTest {
         PersonDTO dto = input.mockDTO(1);
 
         when(repository.save(person)).thenReturn(persisted);
-
         var result = service.create(dto);
 
-        assertNotNull(result);
-        assertNotNull(result.getId());
-        assertNotNull(result.getLinks());
-
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(link -> link.getRel().equals("self") &&
-                        link.getHref().endsWith("api/person/v1/1") &&
-                        link.getType().equals("GET")));
-
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(link -> link.getRel().equals("findAll") &&
-                        link.getHref().endsWith("api/person/v1") &&
-                        link.getType().equals("GET")));
-
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(link -> link.getRel().equals("create") &&
-                        link.getHref().endsWith("api/person/v1") &&
-                        link.getType().equals("POST")));
-
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(link -> link.getRel().equals("update") &&
-                        link.getHref().endsWith("api/person/v1") &&
-                        link.getType().equals("PUT")));
-
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(link -> link.getRel().equals("delete") &&
-                        link.getHref().endsWith("api/person/v1/1") &&
-                        link.getType().equals("DELETE")));
-
-        assertEquals("First Name Test1", result.getFirstName());
-        assertEquals("Last Name Test1", result.getLastName());
-        assertEquals("Address Test1", result.getAddress());
-        assertEquals("Female", result.getGender());
+        checkHateoasLinks(result, 1);
     }
 
     @Test
-    void createV2() {
+    void testCreateWithNullPerson() {
+        Exception exception = assertThrows(RequiredObjectIsNullException.class, () -> {
+            service.create(null);
+        });
+        String expectedMessage = "It is not allowed to pass null as a required object";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
@@ -148,39 +104,17 @@ class PersonServiceTest {
 
         var result = service.update(dto);
 
-        assertNotNull(result);
-        assertNotNull(result.getId());
-        assertNotNull(result.getLinks());
-
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(link -> link.getRel().equals("self") &&
-                        link.getHref().endsWith("api/person/v1/1") &&
-                        link.getType().equals("GET")));
-
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(link -> link.getRel().equals("findAll") &&
-                        link.getHref().endsWith("api/person/v1") &&
-                        link.getType().equals("GET")));
-
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(link -> link.getRel().equals("create") &&
-                        link.getHref().endsWith("api/person/v1") &&
-                        link.getType().equals("POST")));
-
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(link -> link.getRel().equals("update") &&
-                        link.getHref().endsWith("api/person/v1") &&
-                        link.getType().equals("PUT")));
-
-        assertNotNull(result.getLinks().stream()
-                .anyMatch(link -> link.getRel().equals("delete") &&
-                        link.getHref().endsWith("api/person/v1/1") &&
-                        link.getType().equals("DELETE")));
-
-        assertEquals("First Name Test1", result.getFirstName());
-        assertEquals("Last Name Test1", result.getLastName());
-        assertEquals("Address Test1", result.getAddress());
-        assertEquals("Female", result.getGender());
+        checkHateoasLinks(result, 1);
+    }
+    
+    @Test
+    void testUpdateWithNullPerson() {
+        Exception exception = assertThrows(RequiredObjectIsNullException.class, () -> {
+            service.update(null);
+        });
+        String expectedMessage = "It is not allowed to pass null as a required object";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
@@ -192,7 +126,32 @@ class PersonServiceTest {
         service.delete(1L);
         verify(repository, times(1)).findById(anyLong());
         verify(repository, times(1)).delete(any(Person.class));
-        //verifyNoInteractions(repository);
+        verifyNoMoreInteractions(repository);
+    }
+
+    private void checkHateoasLinks(PersonDTO person, int i) {
+        assertNotNull(person);
+        assertNotNull(person.getId());
+
+        checkLinks(person, "self", "api/person/v1/"+i, "GET");
+        checkLinks(person, "findAll", "api/person/v1", "GET");
+        checkLinks(person, "create", "api/person/v1", "POST");
+        checkLinks(person, "update", "api/person/v1", "PUT");
+        checkLinks(person, "delete", "api/person/v1/"+i, "DELETE");
+
+        assertEquals("First Name Test" + i, person.getFirstName());
+        assertEquals("Last Name Test" + i, person.getLastName());
+        assertEquals("Address Test" + i, person.getAddress());
+        assertEquals(((i % 2)==0) ? "Male" : "Female", person.getGender());
+    }
+
+    private void checkLinks(PersonDTO person, String action, String strLink, String type) {
+        assertNotNull(person.getLinks(), "The list of links must not be null.");
+
+        assertTrue(person.getLinks().stream()
+                        .anyMatch(link -> link.getRel().value().equals(action) &&
+                                link.getHref().endsWith(strLink) &&
+                                link.getType().equals(type)), "No links match the criteria.");
 
 
     }

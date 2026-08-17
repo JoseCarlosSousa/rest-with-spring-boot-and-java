@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import pt.seixal.carlos.controllers.PersonController;
 import pt.seixal.carlos.data.dto.v1.PersonDTO;
 import pt.seixal.carlos.data.dto.v2.PersonDTOV2;
+import pt.seixal.carlos.exceptions.RequiredObjectIsNullException;
 import pt.seixal.carlos.exceptions.ResourceNotFoundException;
 import pt.seixal.carlos.mapper.custom.PersonMapper;
 import pt.seixal.carlos.model.Person;
@@ -45,6 +46,7 @@ public class PersonService {
 
     public PersonDTO create(PersonDTO person) {
         logger.info("Creating Person");
+        if (person == null) throw new RequiredObjectIsNullException();
 
         var entity = parseObject(person, Person.class);
         var dto = parseObject(repository.save(entity), PersonDTO.class);
@@ -66,6 +68,8 @@ public class PersonService {
 
     public PersonDTO update(PersonDTO person) {
         logger.info("Edit Person");
+
+        if (person == null) throw new RequiredObjectIsNullException();
 
         Person entity = getPerson(person.getId());
         entity.setFirstName(person.getFirstName());
