@@ -11,21 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-
-        // via PATH EXTENSION http://localhost:8080/api/person/v1/2.json Deprecated
-
-        // via QUERY PARAM http://localhost:8080/api/person/v1/2?mediaType=xml
-        /*
-        configurer.favorParameter(true)
-                .parameterName("mediaType")
-                .ignoreAcceptHeader(true)
-                .useRegisteredExtensionsOnly(false)
-                .defaultContentType(MediaType.APPLICATION_JSON)
-                .mediaType("json", MediaType.APPLICATION_JSON)
-                .mediaType("xml", MediaType.APPLICATION_XML);
-         */
-
-        // via HEADER ACCEPT http://localhost:8080/api/person/v1/2
+        
         configurer.favorParameter(false)
                 .ignoreAcceptHeader(false)
                 .useRegisteredExtensionsOnly(false)
@@ -39,7 +25,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173")
+                .allowedOrigins("http://localhost:5173", "https://onrender.com")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD")
                 .allowedHeaders("*")
                 .exposedHeaders("Authorization")
