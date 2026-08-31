@@ -12,19 +12,17 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.lifecycle.Startables;
 
 @ContextConfiguration(initializers = AbstractIntegrationTest.Initializer.class)
-public class AbstractIntegrationTest {
+public abstract class AbstractIntegrationTest {
 	
 	static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 		
-		static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:9.1.0");
-
-
+		static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.1.0");
 
 		private static void startContainers() {
 			Startables.deepStart(Stream.of(mysql)).join();
 		}
 
-		private Map<String, String> createConnectionConfiguration() {
+		private static Map<String, Object> createConnectionConfiguration() {
 			return Map.of(
 					"spring.datasource.url", mysql.getJdbcUrl(),
 					"spring.datasource.username", mysql.getUsername(),
@@ -35,11 +33,9 @@ public class AbstractIntegrationTest {
 		@Override
 		public void initialize(ConfigurableApplicationContext applicationContext) {
 			startContainers();
-			ConfigurableEnvironment enviroment = applicationContext.getEnvironment();
-			MapPropertySource testcontainers = new MapPropertySource("testcontainers", (Map)createConnectionConfiguration());
-			enviroment.getPropertySources().addFirst(testcontainers);;
-			
+			ConfigurableEnvironment environment = applicationContext.getEnvironment();
+			MapPropertySource testcontainers = new MapPropertySource("testcontainers", createConnectionConfiguration());
+			environment.getPropertySources().addFirst(testcontainers);
 		}
 	}
-
 }

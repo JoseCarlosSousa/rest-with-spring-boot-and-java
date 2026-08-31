@@ -1,6 +1,5 @@
 package pt.seixal.carlos.data.dto.v1;
 
-import com.fasterxml.jackson.annotation.*;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;

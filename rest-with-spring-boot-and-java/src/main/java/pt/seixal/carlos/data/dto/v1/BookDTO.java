@@ -1,9 +1,9 @@
 package pt.seixal.carlos.data.dto.v1;
 
-import jakarta.persistence.*;
+
 import org.springframework.hateoas.RepresentationModel;
 
-import java.io.Serial;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;

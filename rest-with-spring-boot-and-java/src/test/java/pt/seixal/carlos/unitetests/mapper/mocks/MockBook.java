@@ -4,7 +4,6 @@ import pt.seixal.carlos.data.dto.v1.BookDTO;
 import pt.seixal.carlos.model.Book;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;

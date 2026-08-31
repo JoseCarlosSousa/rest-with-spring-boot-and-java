@@ -5,7 +5,9 @@ spring:
   application:
     name: rest-with-spring-boot-and-java
   datasource:
-
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  flyway:
+    enabled: true
 
   jpa:
     show-sql: false
@@ -16,9 +18,8 @@ spring:
 logging:
   level:
     root: INFO
-    #pt.seixal.carlos: INFO
     
-spring-doc:
+springdoc:
   paths-to-scan: /api/**/v1/**
   swagger-ui:
     use-root-path: true
