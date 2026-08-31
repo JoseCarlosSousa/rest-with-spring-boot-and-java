@@ -1,0 +1,13 @@
+# Maven build outputs
+target/
+*.jar
+*.war
+
+# IDE settings (IntelliJ)
+.idea/
+*.iml
+*.iws
+
+# Operating System files
+.DS_Store
+Thumbs.db

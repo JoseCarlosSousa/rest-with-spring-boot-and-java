@@ -16,7 +16,8 @@
 	<properties>
 		<java.version>21</java.version>
 		<dozer.version>7.0.0</dozer.version>
-		<spingdoc.version>2.7.0</spingdoc.version>
+    <spingdoc.version>2.7.0</spingdoc.version>
+    <containers.version>1.20.4</containers.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -31,7 +32,6 @@
 			<groupId>org.springframework.hateoas</groupId>
 			<artifactId>spring-hateoas</artifactId>
 		</dependency>
-		<!-- Source: https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -69,6 +69,16 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mysql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
