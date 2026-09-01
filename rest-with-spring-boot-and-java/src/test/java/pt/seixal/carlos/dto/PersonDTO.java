@@ -1,33 +1,25 @@
-package pt.seixal.carlos.model;
+package pt.seixal.carlos.dto;
 
-import jakarta.persistence.*;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
-@Entity
-@Table(name="person")
-public class Person implements Serializable {
+import jakarta.xml.bind.annotation.XmlRootElement;
 
-    @Serial
+@XmlRootElement(name = "PersonDTO")
+public class PersonDTO implements Serializable {
+
+
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "first_name", nullable = false, length = 80)
     private String firstName;
-    @Column(name = "last_name", nullable = false, length = 80)
     private String lastName;
-    @Column(nullable = false, length = 100)
     private String address;
-    @Column(nullable = false, length = 6)
     private String gender;
-    @Column(nullable = false)
     private Boolean enabled;
 
-    public Person() {
+    public PersonDTO() {
     }
 
     public Long getId() {
@@ -91,7 +83,7 @@ public class Person implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Person other = (Person) obj;
+		PersonDTO other = (PersonDTO) obj;
 		return Objects.equals(address, other.address) && Objects.equals(enabled, other.enabled)
 				&& Objects.equals(firstName, other.firstName) && Objects.equals(gender, other.gender)
 				&& Objects.equals(id, other.id) && Objects.equals(lastName, other.lastName);

@@ -10,6 +10,7 @@ import pt.seixal.carlos.data.dto.v1.PersonDTO;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/api/person/v1")
 @Tag(name="People", description="Endpoints for ManagingPeople")
@@ -23,11 +24,13 @@ public class PersonController implements PersonControllerDocs {
         return service.findAll();
     }
 
+    //@CrossOrigin(origins = "http://localhost:8080")
     @Override
     public PersonDTO findById(@PathVariable("id") Long id) {
         return service.findById(id);
     }
 
+    //@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:8090"})
     @Override
     public PersonDTO create(@RequestBody PersonDTO person) {
         return service.create(person);
@@ -43,4 +46,9 @@ public class PersonController implements PersonControllerDocs {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+	@Override
+	public PersonDTO disablePerson(Long id) {
+		return service.disablePerson(id);
+	}
 }

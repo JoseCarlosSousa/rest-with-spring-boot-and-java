@@ -1,5 +1,6 @@
 package pt.seixal.carlos.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
@@ -8,6 +9,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+	
+	@Value("${cors.originPatterns}")
+	private String corsOriginPatterns;
 
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
@@ -24,9 +28,11 @@ public class WebConfig implements WebMvcConfigurer {
     // CORS - React
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+    	var allowedOrigins = corsOriginPatterns.split(",");
+    	
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173", "https://person-book-react.onrender.com")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD")
+                .allowedOrigins(allowedOrigins)
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH", "TRACE")
                 .allowedHeaders("*")
                 .exposedHeaders("Authorization")
                 .allowCredentials(true);
