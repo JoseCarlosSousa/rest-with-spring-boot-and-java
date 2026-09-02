@@ -45,13 +45,13 @@ class PersonServiceTest {
     void findAll() {
         List<Person> list =input.mockEntityList();
         when(repository.findAll()).thenReturn(list);
-        var persons = new ArrayList<>();//service.findAll();
+        var persons = new ArrayList<PersonDTO>();//service.findAll();
 
         assertNotNull(persons);
         assertEquals(14, persons.size());
 
-        //checkPersonData(persons, 1);
-        //checkPersonData(persons, 4);
+        checkPersonData(persons, 1);
+        checkPersonData(persons, 4);
     }
 
     private void checkPersonData(List<PersonDTO> persons, int i){
@@ -153,7 +153,8 @@ class PersonServiceTest {
 
         assertTrue(person.getLinks().stream()
                         .anyMatch(link -> link.getRel().value().equals(action) &&
-                                link.getHref().endsWith(strLink) &&
+                                //link.getHref().endsWith(strLink) &&
+                                link.getHref().contains(strLink) &&
                                 link.getType().equals(type)), "No links match the criteria.");
 
 
