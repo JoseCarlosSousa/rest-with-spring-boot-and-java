@@ -11,7 +11,6 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Service;
 import pt.seixal.carlos.controllers.BookController;
-import pt.seixal.carlos.controllers.PersonController;
 import pt.seixal.carlos.data.dto.v1.BookDTO;
 import pt.seixal.carlos.exceptions.RequiredObjectIsNullException;
 import pt.seixal.carlos.exceptions.ResourceNotFoundException;
