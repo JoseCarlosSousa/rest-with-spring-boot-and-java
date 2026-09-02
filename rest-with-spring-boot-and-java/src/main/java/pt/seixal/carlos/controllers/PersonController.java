@@ -2,11 +2,12 @@ package pt.seixal.carlos.controllers;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.seixal.carlos.controllers.docs.PersonControllerDocs;
@@ -23,7 +24,7 @@ public class PersonController implements PersonControllerDocs {
     private PersonService service;
 
     @Override
-    public ResponseEntity<Page<PersonDTO>> findAll(
+    public ResponseEntity<PagedModel<EntityModel<PersonDTO>>> findAll(
         	@RequestParam(value = "page", defaultValue = "0") int page,
         	@RequestParam(value = "size", defaultValue = "12") int size,
         	@RequestParam(value = "direction", defaultValue = "asc") String direction

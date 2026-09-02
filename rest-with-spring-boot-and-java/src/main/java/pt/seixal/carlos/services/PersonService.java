@@ -3,8 +3,12 @@ package pt.seixal.carlos.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +30,11 @@ public class PersonService {
 
     @Autowired
     PersonRepository repository;
+    
+    @Autowired
+    PagedResourcesAssembler<PersonDTO> assembler;
 
-    public Page<PersonDTO> findAll(Pageable pageable) {
+    public PagedModel<EntityModel<PersonDTO>> findAll(Pageable pageable) {
         logger.info("Finding all people!");
         
         var people = repository.findAll(pageable);
@@ -37,7 +44,13 @@ public class PersonService {
 			addHateoasLinks(dto);
 			return dto;
 		});
-        return peopleWithLinks;
+		
+		Link findAllLink = WebMvcLinkBuilder.linkTo(
+				WebMvcLinkBuilder.methodOn(PersonController.class)
+				.findAll(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().toString()))
+				.withSelfRel();
+		
+        return assembler.toModel(peopleWithLinks, findAllLink);
     }
 
     public PersonDTO findById(Long id) {
