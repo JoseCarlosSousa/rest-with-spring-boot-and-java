@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -15,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +25,7 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
 import pt.seixal.carlos.config.TestConfigs;
 import pt.seixal.carlos.dto.PersonDTO;
+import pt.seixal.carlos.dto.wrappers.json.WrapperPersonDTO;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
 
@@ -193,11 +192,12 @@ class PersonControllerJsonTest  extends AbstractIntegrationTest {
 	}
 	
 	@Test
-	@Disabled
 	@Order(6)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
 
 		var content = given(especification)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.queryParam("page", 1, "size", 10, "direction", "asc")
 				.when()
 					.get()
 				.then()
@@ -206,19 +206,55 @@ class PersonControllerJsonTest  extends AbstractIntegrationTest {
 				.extract()
 					.body()
 						.asString();
+
+		//List<PersonDTO> people = objectMapper.readValue(content, new TypeReference<List<PersonDTO>>() {});
+		WrapperPersonDTO wrapper = objectMapper.readValue(content, WrapperPersonDTO.class);
+		List<PersonDTO> people = wrapper.getEmbedded().getPeople();
 		
-		List<PersonDTO> people = objectMapper.readValue(content, new TypeReference<List<PersonDTO>>() {});
 		assertNotNull(people);
 		
-		for (PersonDTO person : people) {
-			assertNotNull(person.getId());
-			assertTrue(person.getId() > 0);
+		PersonDTO person1 = people.get(0);
+		
+		//assertEquals(127, person1.getId());
+		assertEquals("Abey", person1.getFirstName());
+		assertEquals("Lebreton", person1.getLastName());
+		assertEquals("Apt 1341", person1.getAddress());
+		assertEquals("Male", person1.getGender());
+		assertTrue(person1.getEnabled());
+		
+	}
+	
+	@Test
+	@Order(7)
+	void findByNameTest() throws JsonMappingException, JsonProcessingException {
 
-			assertNotNull(person.getFirstName());
-			assertNotNull(person.getLastName());
-			assertNotNull(person.getAddress());
-			assertNotNull(person.getGender());
-		}
+		//api/person/v1/findPeopleByName/and?page=0&size=5&direction=asc
+		var content = given(especification)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.pathParam("firstName", "and")
+				.queryParam("page", 0, "size", 10, "direction", "asc")
+				.when()
+					.get("findPeopleByName/{firstName}")
+				.then()
+					.statusCode(200)
+					.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.extract()
+					.body()
+						.asString();
+
+		//List<PersonDTO> people = objectMapper.readValue(content, new TypeReference<List<PersonDTO>>() {});
+		WrapperPersonDTO wrapper = objectMapper.readValue(content, WrapperPersonDTO.class);
+		List<PersonDTO> people = wrapper.getEmbedded().getPeople();
+		
+		assertNotNull(people);
+		
+		PersonDTO person1 = people.get(0);
+		
+		assertEquals("Aland", person1.getFirstName());
+		assertEquals("Boyn", person1.getLastName());
+		assertEquals("Apt 653", person1.getAddress());
+		assertEquals("Male", person1.getGender());
+		assertFalse(person1.getEnabled());
 		
 	}
 	

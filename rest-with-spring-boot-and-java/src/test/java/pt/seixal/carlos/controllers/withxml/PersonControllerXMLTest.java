@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -15,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -27,6 +25,7 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
 import pt.seixal.carlos.config.TestConfigs;
 import pt.seixal.carlos.dto.PersonDTO;
+import pt.seixal.carlos.dto.wrappers.xml.PagedModelPerson;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
 
@@ -199,12 +198,12 @@ class PersonControllerXMLTest  extends AbstractIntegrationTest {
 	}
 	
 	@Test
-	@Disabled
 	@Order(6)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
 
 		var content = given(especification)
 				.accept(MediaType.APPLICATION_XML_VALUE)
+				.queryParam("page", 1, "size", 10, "direction", "asc")
 				.when()
 					.get()
 				.then()
@@ -214,18 +213,46 @@ class PersonControllerXMLTest  extends AbstractIntegrationTest {
 					.body()
 						.asString();
 		
-		List<PersonDTO> people = objectMapper.readValue(content, new TypeReference<List<PersonDTO>>() {});
-		assertNotNull(people);
+		//List<PersonDTO> people = objectMapper.readValue(content, new TypeReference<List<PersonDTO>>() {});
+		PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class); 
+		List<PersonDTO> people = wrapper.getContent();
 		
-		for (PersonDTO person : people) {
-			assertNotNull(person.getId());
-			assertTrue(person.getId() > 0);
+		PersonDTO person1 = people.get(0);
+		assertEquals("Abey", person1.getFirstName());
+		assertEquals("Lebreton", person1.getLastName());
+		assertEquals("Apt 1341", person1.getAddress());
+		assertEquals("Male", person1.getGender());
+		assertTrue(person1.getEnabled());
+		
+	}	
+	
+	@Test
+	@Order(7)
+	void findByNameTest() throws JsonMappingException, JsonProcessingException {
 
-			assertNotNull(person.getFirstName());
-			assertNotNull(person.getLastName());
-			assertNotNull(person.getAddress());
-			assertNotNull(person.getGender());
-		}
+		var content = given(especification)
+				.accept(MediaType.APPLICATION_XML_VALUE)
+				.pathParam("firstName", "and")
+				.queryParam("page", 0, "size", 10, "direction", "asc")
+				.when()
+					.get("findPeopleByName/{firstName}")
+				.then()
+					.statusCode(200)
+					.contentType(MediaType.APPLICATION_XML_VALUE)
+				.extract()
+					.body()
+						.asString();
+		
+		//List<PersonDTO> people = objectMapper.readValue(content, new TypeReference<List<PersonDTO>>() {});
+		PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class); 
+		List<PersonDTO> people = wrapper.getContent();
+		
+		PersonDTO person1 = people.get(0);
+		assertEquals("Aland", person1.getFirstName());
+		assertEquals("Boyn", person1.getLastName());
+		assertEquals("Apt 653", person1.getAddress());
+		assertEquals("Male", person1.getGender());
+		assertFalse(person1.getEnabled());
 		
 	}
 	

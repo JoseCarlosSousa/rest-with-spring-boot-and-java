@@ -41,14 +41,14 @@ class PersonServiceTest {
     }
 
     @Test
-    @Disabled("REASON: Still Under Development")
-    void findAll() {
+    @Disabled
+    void findAllTest() {
         List<Person> list =input.mockEntityList();
         when(repository.findAll()).thenReturn(list);
         var persons = new ArrayList<PersonDTO>();//service.findAll();
 
         assertNotNull(persons);
-        assertEquals(14, persons.size());
+        //assertEquals(14, persons.size());
 
         checkPersonData(persons, 1);
         checkPersonData(persons, 4);

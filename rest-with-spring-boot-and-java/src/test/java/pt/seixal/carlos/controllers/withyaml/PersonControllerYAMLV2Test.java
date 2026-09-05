@@ -3,11 +3,9 @@ package pt.seixal.carlos.controllers.withyaml;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -28,6 +26,7 @@ import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import pt.seixal.carlos.config.TestConfigs;
 import pt.seixal.carlos.dto.PersonDTO;
+import pt.seixal.carlos.dto.wrappers.xml.PagedModelPerson;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
 
@@ -210,12 +209,12 @@ class PersonControllerYAMLV2Test  extends AbstractIntegrationTest {
 	}
 	
 	@Test
-	@Disabled
 	@Order(6)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
 
 		var response = given(especification)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
+				.queryParam("page", 1, "size", 10, "direction", "asc")
 				.when()
 					.get()
 				.then()
@@ -223,20 +222,48 @@ class PersonControllerYAMLV2Test  extends AbstractIntegrationTest {
 					.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.extract()
 					.body()
-						.as(PersonDTO[].class, objectMapper);
-		
-		List<PersonDTO> people = Arrays.asList(response);
+						.as(PagedModelPerson.class, objectMapper);
+
+		//List<PersonDTO> people = Arrays.asList(response);
+		List<PersonDTO> people = response.getContent();
 		assertNotNull(people);
 		
-		for (PersonDTO person : people) {
-			assertNotNull(person.getId());
-			assertTrue(person.getId() > 0);
+		PersonDTO person1 = people.get(0);
+		assertEquals("Abey", person1.getFirstName());
+		assertEquals("Lebreton", person1.getLastName());
+		assertEquals("Apt 1341", person1.getAddress());
+		assertEquals("Male", person1.getGender());
+		assertTrue(person1.getEnabled());
+		
+	}	
+	
+	@Test
+	@Order(6)
+	void findByNameTest() throws JsonMappingException, JsonProcessingException {
 
-			assertNotNull(person.getFirstName());
-			assertNotNull(person.getLastName());
-			assertNotNull(person.getAddress());
-			assertNotNull(person.getGender());
-		}
+		var response = given(especification)
+				.accept(MediaType.APPLICATION_YAML_VALUE)
+				.pathParam("firstName", "and")
+				.queryParam("page", 0, "size", 10, "direction", "asc")
+				.when()
+					.get("findPeopleByName/{firstName}")
+				.then()
+					.statusCode(200)
+					.contentType(MediaType.APPLICATION_YAML_VALUE)
+				.extract()
+					.body()
+						.as(PagedModelPerson.class, objectMapper);
+
+		//List<PersonDTO> people = Arrays.asList(response);
+		List<PersonDTO> people = response.getContent();
+		assertNotNull(people);
+		
+		PersonDTO person1 = people.get(0);
+		assertEquals("Aland", person1.getFirstName());
+		assertEquals("Boyn", person1.getLastName());
+		assertEquals("Apt 653", person1.getAddress());
+		assertEquals("Male", person1.getGender());
+		assertFalse(person1.getEnabled());
 		
 	}
 	

@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import pt.seixal.carlos.exceptions.ExceptionResponse;
+import pt.seixal.carlos.exceptions.FileNotFoundException;
+import pt.seixal.carlos.exceptions.FileStorageException;
 import pt.seixal.carlos.exceptions.RequiredObjectIsNullException;
 import pt.seixal.carlos.exceptions.ResourceNotFoundException;
 
@@ -30,6 +32,16 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
     @ExceptionHandler(RequiredObjectIsNullException.class)
     public final ResponseEntity<ExceptionResponse> handleBadRequestExceptions(Exception ex, WebRequest request) {
         return new ResponseEntity<>(getResponse(ex, request), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(FileNotFoundException.class)
+    public final ResponseEntity<ExceptionResponse> handleFileNotFoundExceptions(Exception ex, WebRequest request) {
+        return new ResponseEntity<>(getResponse(ex, request), HttpStatus.NOT_FOUND);
+    }
+    
+    @ExceptionHandler(FileStorageException.class)
+    public final ResponseEntity<ExceptionResponse> handleFileStoreExceptions(Exception ex, WebRequest request) {
+        return new ResponseEntity<>(getResponse(ex, request), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     public final ExceptionResponse getResponse(Exception ex, WebRequest request) {
