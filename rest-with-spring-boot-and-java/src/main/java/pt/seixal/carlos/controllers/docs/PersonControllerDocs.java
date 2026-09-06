@@ -2,6 +2,7 @@ package pt.seixal.carlos.controllers.docs;
 
 import java.util.List;
 
+import org.springframework.core.io.Resource;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
@@ -21,7 +22,9 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import pt.seixal.carlos.data.dto.v1.PersonDTO;
+import pt.seixal.carlos.file.exporter.MediaTypes;
 
 
 public interface PersonControllerDocs {
@@ -51,6 +54,34 @@ public interface PersonControllerDocs {
         	@RequestParam(value = "page", defaultValue = "0") int page,
         	@RequestParam(value = "size", defaultValue = "12") int size,
         	@RequestParam(value = "direction", defaultValue = "asc") String direction
+    );
+
+    @GetMapping(value = "/exportPage",
+            produces = {
+                    MediaTypes.CSV,
+                    MediaTypes.XLSX
+})
+    @Operation(summary = "Export people",
+            description = "Export a Page od People in XLSX and CSV format",
+            tags = {"People"},
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200",
+                            content = {
+                            		@Content(mediaType = MediaTypes.CSV),
+                            		@Content(mediaType = MediaTypes.XLSX)
+                            		}),
+                    @ApiResponse(description = "No content", responseCode = "204", content = @Content),
+                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+            })
+    ResponseEntity<Resource> exportPage(
+        	@RequestParam(value = "page", defaultValue = "0") int page,
+        	@RequestParam(value = "size", defaultValue = "12") int size,
+        	@RequestParam(value = "direction", defaultValue = "asc") String direction,
+        	HttpServletRequest request
     );
 
     @GetMapping(value = "/findPeopleByName/{firstName}",

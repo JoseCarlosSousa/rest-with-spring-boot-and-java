@@ -3,12 +3,15 @@ package pt.seixal.carlos.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,8 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import pt.seixal.carlos.controllers.docs.PersonControllerDocs;
 import pt.seixal.carlos.data.dto.v1.PersonDTO;
+import pt.seixal.carlos.file.exporter.MediaTypes;
 import pt.seixal.carlos.services.PersonService;
 
 
@@ -41,6 +46,28 @@ public class PersonController implements PersonControllerDocs {
     	Pageable pageable = PageRequest.of(page, size, Sort.by(sort, "firstName"));
     	return ResponseEntity.ok(service.findAll(pageable));
     }
+    
+	@Override
+	public ResponseEntity<Resource> exportPage(
+        	@RequestParam(value = "page", defaultValue = "0") int page,
+        	@RequestParam(value = "size", defaultValue = "12") int size,
+        	@RequestParam(value = "direction", defaultValue = "asc") String direction, 
+        	HttpServletRequest request) {
+		
+    	var sort = "desc".equalsIgnoreCase(direction) ? Direction.DESC : Direction.ASC;
+    	Pageable pageable = PageRequest.of(page, size, Sort.by(sort, "firstName"));
+    	String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
+    	
+    	Resource file = service.exportPage(pageable, acceptHeader);
+    	var contentType = acceptHeader != null ? acceptHeader : "application/octet-stream";
+    	var fileExtension = MediaTypes.XLSX.equalsIgnoreCase(acceptHeader) ? "xlsx" : "csv";
+    	var fileName = "people_exported." + fileExtension;
+    	
+    	return ResponseEntity.ok()
+    			.contentType(MediaType.parseMediaType(contentType))
+    			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+    			.body(file);
+	}
     
     @Override
     public ResponseEntity<PagedModel<EntityModel<PersonDTO>>> findByName(
