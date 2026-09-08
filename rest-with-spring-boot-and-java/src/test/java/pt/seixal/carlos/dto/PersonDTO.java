@@ -2,9 +2,11 @@ package pt.seixal.carlos.dto;
 
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 import jakarta.xml.bind.annotation.XmlRootElement;
+import pt.seixal.carlos.model.Book;
 
 @XmlRootElement(name = "PersonDTO")
 public class PersonDTO implements Serializable {
@@ -18,6 +20,10 @@ public class PersonDTO implements Serializable {
     private String address;
     private String gender;
     private Boolean enabled;
+    private String profileUrl;
+    private String photoUrl;
+    private List<Book> books;
+
 
     public PersonDTO() {
     }
@@ -70,9 +76,33 @@ public class PersonDTO implements Serializable {
 		this.enabled = enabled;
 	}
 
+	public String getProfileUrl() {
+		return profileUrl;
+	}
+
+	public void setProfileUrl(String profileUrl) {
+		this.profileUrl = profileUrl;
+	}
+
+	public String getPhotoUrl() {
+		return photoUrl;
+	}
+
+	public void setPhotoUrl(String photoUrl) {
+		this.photoUrl = photoUrl;
+	}
+
+	public List<Book> getBooks() {
+		return books;
+	}
+
+	public void setBooks(List<Book> books) {
+		this.books = books;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(address, enabled, firstName, gender, id, lastName);
+		return Objects.hash(address, books, enabled, firstName, gender, id, lastName, photoUrl, profileUrl);
 	}
 
 	@Override
@@ -84,10 +114,14 @@ public class PersonDTO implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		PersonDTO other = (PersonDTO) obj;
-		return Objects.equals(address, other.address) && Objects.equals(enabled, other.enabled)
-				&& Objects.equals(firstName, other.firstName) && Objects.equals(gender, other.gender)
-				&& Objects.equals(id, other.id) && Objects.equals(lastName, other.lastName);
+		return Objects.equals(address, other.address) && Objects.equals(books, other.books)
+				&& Objects.equals(enabled, other.enabled) && Objects.equals(firstName, other.firstName)
+				&& Objects.equals(gender, other.gender) && Objects.equals(id, other.id)
+				&& Objects.equals(lastName, other.lastName) && Objects.equals(photoUrl, other.photoUrl)
+				&& Objects.equals(profileUrl, other.profileUrl);
 	}
+
+
 
 
 }

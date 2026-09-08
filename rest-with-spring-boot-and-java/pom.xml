@@ -22,6 +22,7 @@
     <commons-csv.version>1.12.0</commons-csv.version>
     <jasper.version>6.21.3</jasper.version>
     <jasper.pdf.version>7.0.1</jasper.pdf.version>
+    <google.zxing.version>3.5.4</google.zxing.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -74,6 +75,16 @@
         <artifactId>jasperreports-pdf</artifactId>
         <version>${jasper.pdf.version}</version>
     </dependency>
+  <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>core</artifactId>
+      <version>${google.zxing.version}</version>
+  </dependency>
+<dependency>
+    <groupId>com.google.zxing</groupId>
+    <artifactId>javase</artifactId>
+    <version>${google.zxing.version}</version>
+</dependency>
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
