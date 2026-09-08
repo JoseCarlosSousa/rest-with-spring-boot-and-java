@@ -8,6 +8,7 @@ NGQ4NS1hMGUzLWJjYmQ4YzlhZWEzNzs=]]>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MyConnection"/>
 	<parameter name="PERSON_ID" class="java.lang.Long"/>
 	<parameter name="SUB_REPORT_DATA_SOURCE" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="QR_CODE_IMAGE" class="java.io.InputStream"/>
 	<queryString language="SQL">
 		<![CDATA[SELECT id,
 	CONCAT( first_name,'',last_name) AS name,
@@ -138,12 +139,10 @@ WHERE id = $P{PERSON_ID}]]>
 				<reportElement x="464" y="0" width="90" height="80" uuid="2e81cf93-2a5b-43f1-92ad-b40c8658c8b9"/>
 				<imageExpression><![CDATA[$F{photoUrl}]]></imageExpression>
 			</image>
-			<componentElement>
-				<reportElement x="332" y="-14" width="132" height="123" uuid="0d9786b8-6c72-4044-84b0-5456ab52a922"/>
-				<jr:QRCode xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
-					<jr:codeExpression><![CDATA[$F{profileUrl}]]></jr:codeExpression>
-				</jr:QRCode>
-			</componentElement>
+			<image>
+				<reportElement x="340" y="0" width="110" height="100" uuid="a339e19f-2bc4-4ddd-8e15-d6f2a385d180"/>
+				<imageExpression><![CDATA[$P{QR_CODE_IMAGE}]]></imageExpression>
+			</image>
 		</band>
 	</title>
 	<detail>
