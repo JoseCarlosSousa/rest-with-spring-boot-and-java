@@ -80,12 +80,30 @@ public class PersonService {
 		FileExporter exporter = this.exporter.getExporter(acceptHeader);
 
 		try {
-			return exporter.exportFile(people);
+			return exporter.exportPeople(people);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("Error exporting file: " + e.getMessage(), e);
 		}
 	}
+    
+
+    public Resource exportPerson(Long id, String acceptHeader) {
+        logger.info("Exporting data of one Person!");
+        
+        
+        var dto = parseObject(getPerson(id), PersonDTO.class);
+        
+		FileExporter exporter = this.exporter.getExporter(acceptHeader);
+
+		try {
+			return exporter.exportPerson(dto);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("Error exporting file: " + e.getMessage(), e);
+		}
+    }
+
     
     public PersonDTO findById(Long id) {
         logger.info("Finding one Person!");

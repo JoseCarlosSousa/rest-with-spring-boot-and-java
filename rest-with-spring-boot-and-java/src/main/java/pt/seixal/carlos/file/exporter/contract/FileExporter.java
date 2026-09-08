@@ -8,5 +8,6 @@ import pt.seixal.carlos.data.dto.v1.PersonDTO;
 
 public interface FileExporter {
 
-	 Resource exportFile(List<PersonDTO> people) throws Exception;
+	 Resource exportPeople(List<PersonDTO> people) throws Exception;
+	 Resource exportPerson(PersonDTO person) throws Exception;
 }

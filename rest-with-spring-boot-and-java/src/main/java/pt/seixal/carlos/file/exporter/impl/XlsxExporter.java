@@ -22,7 +22,7 @@ import pt.seixal.carlos.file.exporter.contract.FileExporter;
 public class XlsxExporter implements FileExporter {
 
 	@Override
-	public Resource exportFile(List<PersonDTO> people) throws Exception {
+	public Resource exportPeople(List<PersonDTO> people) throws Exception {
 		
 		try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("People");
@@ -65,6 +65,12 @@ public class XlsxExporter implements FileExporter {
 		style.setAlignment(HorizontalAlignment.CENTER);
 		
 		return style;
+	}
+
+	@Override
+	public Resource exportPerson(PersonDTO person) throws Exception {
+		
+		return null;
 	}
 
 

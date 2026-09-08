@@ -9,6 +9,7 @@ NGQ4NS1hMGUzLWJjYmQ4YzlhZWEzNzs=]]>
 	<parameter name="PERSON_ID" class="java.lang.Long"/>
 	<parameter name="SUB_REPORT_DATA_SOURCE" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="QR_CODE_IMAGE" class="java.io.InputStream"/>
+	<parameter name="SUB_REPORT_DIR" class="java.lang.String"/>
 	<queryString language="SQL">
 		<![CDATA[SELECT id,
 	CONCAT( first_name,'',last_name) AS name,
@@ -155,8 +156,8 @@ WHERE id = $P{PERSON_ID}]]>
 				<subreportParameter name="SUB_REPORT_DATA_SOURCE">
 					<subreportParameterExpression><![CDATA[$P{SUB_REPORT_DATA_SOURCE}]]></subreportParameterExpression>
 				</subreportParameter>
-				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["/books.jasper"]]></subreportExpression>
+				<dataSourceExpression><![CDATA[$P{SUB_REPORT_DATA_SOURCE}]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUB_REPORT_DIR}]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>

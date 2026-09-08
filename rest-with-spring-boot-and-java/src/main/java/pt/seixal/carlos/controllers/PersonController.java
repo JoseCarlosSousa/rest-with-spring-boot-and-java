@@ -78,6 +78,28 @@ public class PersonController implements PersonControllerDocs {
     			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
     			.body(file);
 	}
+	
+	public ResponseEntity<Resource> export(@PathVariable("id") Long id, HttpServletRequest request){
+
+    	String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
+    	
+    	Resource file = service.exportPerson(id, acceptHeader);
+    	var contentType = acceptHeader != null ? acceptHeader : "application/octet-stream";
+    	
+		Map<String, String> extensionMap = Map.of(
+				MediaTypes.CSV, ".csv",
+				MediaTypes.XLSX, ".xlsx",
+				MediaTypes.PDF, ".pdf"	
+				);
+    	var fileExtension = extensionMap.getOrDefault(contentType, "");
+    	String dateSuffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+    	var fileName = "people_exported_" + dateSuffix + fileExtension;
+    	
+    	return ResponseEntity.ok()
+    			.contentType(MediaType.parseMediaType(contentType))
+    			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+    			.body(file);
+	}
     
     @Override
     public ResponseEntity<PagedModel<EntityModel<PersonDTO>>> findByName(

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="books" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="3b223c3f-66ca-4e6d-ac7c-8c07d7e5c8ab">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="books" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty" uuid="3b223c3f-66ca-4e6d-ac7c-8c07d7e5c8ab">
 	<property name="com.jaspersoft.studio.data.sql.tables">
 		<![CDATA[c3ByaW5nX2Jvb3Rfc3RhcnRlcl9kYXRhX2pwYS5ib29rcyBBUyAsMTE3LDg4LGEyM2Y4N2Q4LWEw
 MDctNGU0Mi1iZGQwLTJhMWQ3OTYzZGQ0ZTs=]]>
@@ -12,6 +12,8 @@ MDctNGU0Mi1iZGQwLTJhMWQ3OTYzZGQ0ZTs=]]>
 			<style mode="Opaque" forecolor="#FFFFFF" backcolor="#E0E0E0"/>
 		</conditionalStyle>
 	</style>
+	<parameter name="PERSON_ID" class="java.lang.Long"/>
+	<parameter name="SUB_REPORT_DATA_SOURCE" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<queryString language="SQL">
 		<![CDATA[SELECT id,
 	author,
@@ -20,7 +22,7 @@ MDctNGU0Mi1iZGQwLTJhMWQ3OTYzZGQ0ZTs=]]>
 	title
 FROM spring_boot_starter_data_jpa.books b
 JOIN spring_boot_starter_data_jpa.person_books pb ON pb.book_id = b.id 
-WHERE pb.person_id = 1;]]>
+WHERE pb.person_id = $P{PERSON_ID};]]>
 	</queryString>
 	<field name="id" class="java.lang.Long">
 		<property name="com.jaspersoft.studio.field.name" value="id"/>
@@ -32,7 +34,7 @@ WHERE pb.person_id = 1;]]>
 		<property name="com.jaspersoft.studio.field.label" value="author"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="books"/>
 	</field>
-	<field name="launchDate" class="java.sql.Date">
+	<field name="launchDate" class="java.util.Date">
 		<property name="com.jaspersoft.studio.field.name" value="launch_date"/>
 		<property name="com.jaspersoft.studio.field.label" value="launchDate"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="books"/>

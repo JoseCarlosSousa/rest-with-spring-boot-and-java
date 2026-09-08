@@ -85,6 +85,32 @@ public interface PersonControllerDocs {
         	@RequestParam(value = "direction", defaultValue = "asc") String direction,
         	HttpServletRequest request
     );
+    
+    @GetMapping(value = "/export/{id}",
+            produces = {
+                    MediaTypes.CSV,
+                    MediaTypes.XLSX,
+                    MediaTypes.PDF
+})
+    @Operation(summary = "Export person",
+            description = "Export a Page od person in XLSX, CSV or PDF format",
+            tags = {"People"},
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200",
+                            content = {
+                            		@Content(mediaType = MediaTypes.CSV),
+                            		@Content(mediaType = MediaTypes.XLSX),
+                            		@Content(mediaType = MediaTypes.PDF)
+                            		}),
+                    @ApiResponse(description = "No content", responseCode = "204", content = @Content),
+                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+            })
+    ResponseEntity<Resource> export(@PathVariable("id") Long id, HttpServletRequest request);
+    
 
     @GetMapping(value = "/findPeopleByName/{firstName}",
             produces = {
