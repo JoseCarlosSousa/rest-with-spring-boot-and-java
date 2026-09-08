@@ -10,6 +10,7 @@ import pt.seixal.carlos.exceptions.BadRequestException;
 import pt.seixal.carlos.file.exporter.MediaTypes;
 import pt.seixal.carlos.file.exporter.contract.FileExporter;
 import pt.seixal.carlos.file.exporter.impl.CsvExporter;
+import pt.seixal.carlos.file.exporter.impl.PdfExporter;
 import pt.seixal.carlos.file.exporter.impl.XlsxExporter;
 
 @Component
@@ -26,6 +27,8 @@ public class FileExporterFactory {
 			return context.getBean(CsvExporter.class);
 		case MediaTypes.XLSX:
 			return context.getBean(XlsxExporter.class);
+		case MediaTypes.PDF:
+			return context.getBean(PdfExporter.class);
 		default:
 			logger.error("Unsupported accept header: {}", acceptHeader);
 			throw new BadRequestException("Invalid Accept Header: " + acceptHeader + ". Supported formats are: "+ MediaTypes.CSV + ", " + MediaTypes.XLSX);

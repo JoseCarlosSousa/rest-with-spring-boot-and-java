@@ -59,7 +59,8 @@ public interface PersonControllerDocs {
     @GetMapping(value = "/exportPage",
             produces = {
                     MediaTypes.CSV,
-                    MediaTypes.XLSX
+                    MediaTypes.XLSX,
+                    MediaTypes.PDF
 })
     @Operation(summary = "Export people",
             description = "Export a Page od People in XLSX and CSV format",
@@ -70,7 +71,8 @@ public interface PersonControllerDocs {
                             responseCode = "200",
                             content = {
                             		@Content(mediaType = MediaTypes.CSV),
-                            		@Content(mediaType = MediaTypes.XLSX)
+                            		@Content(mediaType = MediaTypes.XLSX),
+                            		@Content(mediaType = MediaTypes.PDF)
                             		}),
                     @ApiResponse(description = "No content", responseCode = "204", content = @Content),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),

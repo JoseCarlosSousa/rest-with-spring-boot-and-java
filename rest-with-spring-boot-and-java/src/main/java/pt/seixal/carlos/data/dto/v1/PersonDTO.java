@@ -1,10 +1,10 @@
 package pt.seixal.carlos.data.dto.v1;
 
-import org.springframework.hateoas.RepresentationModel;
-import org.springframework.hateoas.server.core.Relation;
-
 import java.io.Serializable;
 import java.util.Objects;
+
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 @Relation(collectionRelation = "people")
 public class PersonDTO extends RepresentationModel<PersonDTO> implements Serializable {
@@ -67,6 +67,10 @@ public class PersonDTO extends RepresentationModel<PersonDTO> implements Seriali
 
 	public void setEnabled(Boolean enabled) {
 		this.enabled = enabled;
+	}
+	
+	public String getName() {
+		return firstName != null ? firstName : "" + (lastName != null ? lastName : "");
 	}
 
 	@Override

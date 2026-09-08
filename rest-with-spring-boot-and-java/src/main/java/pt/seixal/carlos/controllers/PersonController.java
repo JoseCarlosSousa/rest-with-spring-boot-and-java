@@ -1,6 +1,9 @@
 package pt.seixal.carlos.controllers;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -60,8 +63,15 @@ public class PersonController implements PersonControllerDocs {
     	
     	Resource file = service.exportPage(pageable, acceptHeader);
     	var contentType = acceptHeader != null ? acceptHeader : "application/octet-stream";
-    	var fileExtension = MediaTypes.XLSX.equalsIgnoreCase(acceptHeader) ? "xlsx" : "csv";
-    	var fileName = "people_exported." + fileExtension;
+    	
+		Map<String, String> extensionMap = Map.of(
+				MediaTypes.CSV, ".csv",
+				MediaTypes.XLSX, ".xlsx",
+				MediaTypes.PDF, ".pdf"	
+				);
+    	var fileExtension = extensionMap.getOrDefault(contentType, "");
+    	String dateSuffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+    	var fileName = "people_exported_" + dateSuffix + fileExtension;
     	
     	return ResponseEntity.ok()
     			.contentType(MediaType.parseMediaType(contentType))

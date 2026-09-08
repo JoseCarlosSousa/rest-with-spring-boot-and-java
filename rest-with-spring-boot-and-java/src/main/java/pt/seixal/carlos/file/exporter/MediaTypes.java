@@ -4,5 +4,6 @@ public interface MediaTypes {
 	
 	public static final String CSV = "text/csv";
 	public static final String XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+	public static final String PDF = "application/pdf";
 
 }

@@ -82,7 +82,8 @@ public class PersonService {
 		try {
 			return exporter.exportFile(people);
 		} catch (Exception e) {
-			throw new RuntimeException("Error exporting file: " + e.getMessage());
+			e.printStackTrace();
+			throw new RuntimeException("Error exporting file: " + e.getMessage(), e);
 		}
 	}
     
