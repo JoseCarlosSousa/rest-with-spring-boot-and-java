@@ -14,16 +14,6 @@ MDctNGU0Mi1iZGQwLTJhMWQ3OTYzZGQ0ZTs=]]>
 	</style>
 	<parameter name="PERSON_ID" class="java.lang.Long"/>
 	<parameter name="SUB_REPORT_DATA_SOURCE" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
-	<queryString language="SQL">
-		<![CDATA[SELECT id,
-	author,
-	launch_date AS launchDate,
-	price,
-	title
-FROM spring_boot_starter_data_jpa.books b
-JOIN spring_boot_starter_data_jpa.person_books pb ON pb.book_id = b.id 
-WHERE pb.person_id = $P{PERSON_ID};]]>
-	</queryString>
 	<field name="id" class="java.lang.Long">
 		<property name="com.jaspersoft.studio.field.name" value="id"/>
 		<property name="com.jaspersoft.studio.field.label" value="id"/>

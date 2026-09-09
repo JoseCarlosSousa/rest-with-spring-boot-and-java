@@ -10,17 +10,6 @@ NGQ4NS1hMGUzLWJjYmQ4YzlhZWEzNzs=]]>
 	<parameter name="SUB_REPORT_DATA_SOURCE" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="QR_CODE_IMAGE" class="java.io.InputStream"/>
 	<parameter name="SUB_REPORT_DIR" class="java.lang.String"/>
-	<queryString language="SQL">
-		<![CDATA[SELECT id,
-	CONCAT( first_name,'',last_name) AS name,
-	gender,
-	enabled,
-	address,
-	wikipedia_profile_url AS profileUrl,
-	photo_url AS photoUrl
-FROM spring_boot_starter_data_jpa.person
-WHERE id = $P{PERSON_ID}]]>
-	</queryString>
 	<field name="id" class="java.lang.Long">
 		<property name="com.jaspersoft.studio.field.name" value="id"/>
 		<property name="com.jaspersoft.studio.field.label" value="id"/>
