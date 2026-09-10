@@ -15,7 +15,7 @@ import pt.seixal.carlos.file.importer.impl.XlsxImporter;
 @Component
 public class FileImporterFactory {
 
-	private final Logger logger = LoggerFactory.getLogger(FileImporterFactory.class.getName());
+	private final Logger logger = LoggerFactory.getLogger(FileImporterFactory.class);
 	
 	@Autowired
 	private ApplicationContext context;

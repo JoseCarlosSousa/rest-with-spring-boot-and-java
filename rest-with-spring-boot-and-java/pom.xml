@@ -25,6 +25,10 @@
     <google.zxing.version>3.5.4</google.zxing.version>
 	</properties>
 	<dependencies>
+	<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>

@@ -39,7 +39,7 @@ import pt.seixal.carlos.repository.PersonRepository;
 @Service
 public class PersonService {
 
-    private final Logger logger = LoggerFactory.getLogger(PersonService.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(PersonService.class);
 
     @Autowired
     PersonRepository repository;

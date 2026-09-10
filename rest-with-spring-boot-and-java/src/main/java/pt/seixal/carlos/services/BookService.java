@@ -1,5 +1,9 @@
 package pt.seixal.carlos.services;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import static pt.seixal.carlos.mapper.ObjectMapper.parseObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +14,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Service;
+
 import pt.seixal.carlos.controllers.BookController;
 import pt.seixal.carlos.data.dto.v1.BookDTO;
 import pt.seixal.carlos.exceptions.RequiredObjectIsNullException;
@@ -17,14 +22,10 @@ import pt.seixal.carlos.exceptions.ResourceNotFoundException;
 import pt.seixal.carlos.model.Book;
 import pt.seixal.carlos.repository.BookRepository;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-import static pt.seixal.carlos.mapper.ObjectMapper.parseObject;
-
 @Service
 public class BookService {
 
-    private final Logger logger = LoggerFactory.getLogger(BookService.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(BookService.class);
 
     @Autowired
     BookRepository repository;
