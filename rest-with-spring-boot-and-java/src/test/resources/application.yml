@@ -1,35 +1,54 @@
 server:
   port: 8888
+
 cors:
   originPatterns: http://localhost:8080,http://localhost:5173
-  
+
 file:
   upload-dir: /Users/sousa/Documents/CursoOnlineComprado/UploadDir
-  
+
+email:
+  subject: "Default Subject"
+  message: "Default Message"
+
 spring:
   application:
     name: rest-with-spring-boot-and-java
+  
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
+  
   flyway:
     enabled: true
-
+  
   jpa:
     show-sql: false
     hibernate:
       ddl-auto: none
     open-in-view: false
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+
   servlet:
     multipart:
       enabled: true
       file-size-threshold: 2KB
       max-file-size: 200MB
       max-request-size: 215MB
+
 logging:
   level:
     root: INFO
-    
-springdoc:
+
+spring-doc:
   paths-to-scan: /api/**/v1/**
   swagger-ui:
     use-root-path: true
