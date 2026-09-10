@@ -1,7 +1,10 @@
 package pt.seixal.carlos.controllers.withxml;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -262,5 +265,7 @@ class PersonControllerXMLTest  extends AbstractIntegrationTest {
         person.setAddress("Portugal");
         person.setGender("Male");
         person.setEnabled(true);
+        person.setPhotoUrl("https://raw.githubusercontent.com/leandrocgsi/rest-with-spring-boot-and-java-erudio/refs/heads/main/photos/01_senna.jpg");
+        person.setProfileUrl("https://en.wikipedia.org/wiki/Ayrton_Senna");
 	}
 }
