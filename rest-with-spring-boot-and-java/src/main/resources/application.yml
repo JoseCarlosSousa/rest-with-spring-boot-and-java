@@ -4,6 +4,12 @@ cors:
 file:
   upload-dir: /Users/sousa/Documents/CursoOnlineComprado/UploadDir
 
+security:
+  jwt:
+    token:
+      secret-key: 53cr37
+      expire-lenght: 3600000
+
 email:
   subject: "Default Subject"
   message: "Default Message"
@@ -13,7 +19,7 @@ spring:
     name: rest-with-spring-boot-and-java
   
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://host.docker.internal:3306/spring_boot_starter_data_jpa?useTimezone=true&serverTimezone=UTC}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/spring_boot_starter_data_jpa?useTimezone=true&serverTimezone=UTC}
     username: ${SPRING_DATASOURCE_USERNAME:root}
     password: ${SPRING_DATASOURCE_PASSWORD:rootroot}
   
@@ -50,6 +56,8 @@ logging:
     #net.sf.jasperreports.engine.*: TRACE
 
 spring-doc:
-  paths-to-scan: /api/**/v1/**
+  paths-to-scan:
+    - /auth/**
+    - /api/**/v1/**
   swagger-ui:
     use-root-path: true

@@ -14,6 +14,7 @@ import pt.seixal.carlos.exceptions.BadRequestException;
 import pt.seixal.carlos.exceptions.ExceptionResponse;
 import pt.seixal.carlos.exceptions.FileNotFoundException;
 import pt.seixal.carlos.exceptions.FileStorageException;
+import pt.seixal.carlos.exceptions.InvalidJwtAuthenticationException;
 import pt.seixal.carlos.exceptions.RequiredObjectIsNullException;
 import pt.seixal.carlos.exceptions.ResourceNotFoundException;
 
@@ -45,10 +46,15 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
     public final ResponseEntity<ExceptionResponse> handleFileStoreExceptions(Exception ex, WebRequest request) {
         return new ResponseEntity<>(getResponse(ex, request), HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    
+
     @ExceptionHandler(BadRequestException.class)
     public final ResponseEntity<ExceptionResponse> handleBadRequestExceptions2(Exception ex, WebRequest request) {
         return new ResponseEntity<>(getResponse(ex, request), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidJwtAuthenticationException.class)
+    public final ResponseEntity<ExceptionResponse> handleInvalidJwtAuthenticationException(Exception ex, WebRequest request) {
+        return new ResponseEntity<>(getResponse(ex, request), HttpStatus.FORBIDDEN);
     }
 
     public final ExceptionResponse getResponse(Exception ex, WebRequest request) {

@@ -7,6 +7,13 @@ cors:
 file:
   upload-dir: /Users/sousa/Documents/CursoOnlineComprado/UploadDir
 
+
+security:
+  jwt:
+    token:
+      secret-key: 53cr37
+      expire-lenght: 3600000
+
 email:
   subject: "Default Subject"
   message: "Default Message"
@@ -49,6 +56,8 @@ logging:
     root: INFO
 
 spring-doc:
-  paths-to-scan: /api/**/v1/**
+  paths-to-scan:
+    - /auth/**
+    - /api/**/v1/**
   swagger-ui:
     use-root-path: true
