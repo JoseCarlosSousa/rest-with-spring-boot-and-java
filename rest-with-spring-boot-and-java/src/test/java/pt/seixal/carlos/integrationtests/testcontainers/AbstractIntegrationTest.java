@@ -120,6 +120,8 @@ public abstract class AbstractIntegrationTest {
 		} else {
 			assertFalse(person.getEnabled());
 		}
+		assertNotNull(person.getPhotoUrl());
+		assertNotNull(person.getProfileUrl());
 	}
 
 	protected static void mockBook() {
