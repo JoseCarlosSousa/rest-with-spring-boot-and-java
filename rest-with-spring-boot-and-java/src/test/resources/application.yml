@@ -12,7 +12,7 @@ security:
   jwt:
     token:
       secret-key: 53cr37
-      expire-lenght: 3600000
+      expire-length: 3600000
 
 email:
   subject: "Default Subject"
@@ -21,8 +21,11 @@ email:
 spring:
   application:
     name: rest-with-spring-boot-and-java
-  
+
   datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://host.docker.internal:3306/spring_boot_starter_data_jpa?useTimezone=true&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:rootroot}
     driver-class-name: com.mysql.cj.jdbc.Driver
   
   flyway:

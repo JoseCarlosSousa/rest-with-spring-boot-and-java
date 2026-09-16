@@ -2,8 +2,7 @@ package pt.seixal.carlos.controllers.withxml;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
@@ -20,13 +19,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
-import pt.seixal.carlos.dto.PersonDTO;
-import pt.seixal.carlos.dto.wrappers.xml.PagedModelPerson;
+import pt.seixal.carlos.dto.BookDTO;
+import pt.seixal.carlos.dto.wrappers.xml.PagedModelBook;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class PersonControllerXMLTest extends AbstractIntegrationTest {
+class BookControllerXMLTest extends AbstractIntegrationTest {
 
 	private static XmlMapper objectMapper;
 
@@ -40,13 +39,13 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 	@Order(1)
 	void createTest() throws JsonMappingException, JsonProcessingException {
 
-		mockPerson();
-		setEspecification("person");
+		mockBook();
+		setEspecification("book");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_XML_VALUE)
 				.accept(MediaType.APPLICATION_XML_VALUE)
-				.body(person)
+				.body(book)
 				.when()
 				.post()
 				.then()
@@ -56,21 +55,21 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 				.body()
 				.asString();
 
-		person = objectMapper.readValue(content, PersonDTO.class);
+		book = objectMapper.readValue(content, BookDTO.class);
 
-		checkPerson();
+		checkBook();
 	}
 
 	@Test
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
 
-		person.setLastName("Seixal Updated");
+		book.setAuthor("Rui Oliveira");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_XML_VALUE)
 				.accept(MediaType.APPLICATION_XML_VALUE)
-				.body(person)
+				.body(book)
 				.when()
 				.put()
 				.then()
@@ -80,9 +79,9 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 				.body()
 				.asString();
 
-		person = objectMapper.readValue(content, PersonDTO.class);
+		book = objectMapper.readValue(content, BookDTO.class);
 
-		checkPerson("Seixal Updated", true);
+		checkBook("Rui Oliveira");
 	}
 
 	@Test
@@ -92,7 +91,7 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_XML_VALUE)
 				.accept(MediaType.APPLICATION_XML_VALUE)
-				.pathParam("id", person.getId())
+				.pathParam("id", book.getId())
 				.when()
 				.get("{id}")
 				.then()
@@ -102,38 +101,17 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 				.body()
 				.asString();
 
-		person = objectMapper.readValue(content, PersonDTO.class);
+		book = objectMapper.readValue(content, BookDTO.class);
 
-		checkPerson("Seixal Updated", true);
+		checkBook("Rui Oliveira");
 	}
 
 	@Test
 	@Order(4)
-	void disableTest() throws JsonMappingException, JsonProcessingException {
-
-		var content = given(especification)
-				.accept(MediaType.APPLICATION_XML_VALUE)
-				.pathParam("id", person.getId())
-				.when()
-				.patch("{id}")
-				.then()
-				.statusCode(200)
-				.contentType(MediaType.APPLICATION_XML_VALUE)
-				.extract()
-				.body()
-				.asString();
-
-		person = objectMapper.readValue(content, PersonDTO.class);
-
-		checkPerson("Seixal Updated", false);
-	}
-
-	@Test
-	@Order(5)
 	void deleteTest() {
 
 		given(especification)
-				.pathParam("id", person.getId())
+				.pathParam("id", book.getId())
 				.when()
 				.delete("{id}")
 				.then()
@@ -141,7 +119,7 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 	}
 
 	@Test
-	@Order(6)
+	@Order(5)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
 
 		var content = given(especification)
@@ -156,48 +134,18 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 				.body()
 				.asString();
 
-		// List<PersonDTO> people = objectMapper.readValue(content, new
-		// TypeReference<List<PersonDTO>>() {});
-		PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class);
-		List<PersonDTO> people = wrapper.getContent();
+		PagedModelBook wrapper = objectMapper.readValue(content, PagedModelBook.class);
+		List<BookDTO> books = wrapper.getContent();
 
-		PersonDTO person1 = people.get(0);
-		assertEquals("Abey", person1.getFirstName());
-		assertEquals("Lebreton", person1.getLastName());
-		assertEquals("Apt 1341", person1.getAddress());
-		assertEquals("Male", person1.getGender());
-		assertTrue(person1.getEnabled());
+		BookDTO dto = books.get(0);
 
-	}
+		assertNotNull(dto.getAuthor());
+		assertNotNull(dto.getTitle());
+		assertNotNull(dto.getPrice());
 
-	@Test
-	@Order(7)
-	void findByNameTest() throws JsonMappingException, JsonProcessingException {
-
-		var content = given(especification)
-				.accept(MediaType.APPLICATION_XML_VALUE)
-				.pathParam("firstName", "and")
-				.queryParam("page", 0, "size", 10, "direction", "asc")
-				.when()
-				.get("findPeopleByName/{firstName}")
-				.then()
-				.statusCode(200)
-				.contentType(MediaType.APPLICATION_XML_VALUE)
-				.extract()
-				.body()
-				.asString();
-
-		// List<PersonDTO> people = objectMapper.readValue(content, new
-		// TypeReference<List<PersonDTO>>() {});
-		PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class);
-		List<PersonDTO> people = wrapper.getContent();
-
-		PersonDTO person1 = people.get(0);
-		assertEquals("Aland", person1.getFirstName());
-		assertEquals("Boyn", person1.getLastName());
-		assertEquals("Apt 653", person1.getAddress());
-		assertEquals("Male", person1.getGender());
-		assertFalse(person1.getEnabled());
-
+		assertEquals(692, dto.getId());
+		assertEquals("Alis Dict", dto.getAuthor());
+		assertEquals(3.49, dto.getPrice());
+		assertEquals("42 Up", dto.getTitle());
 	}
 }

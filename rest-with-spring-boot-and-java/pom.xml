@@ -23,7 +23,8 @@
     <jasper.version>6.21.3</jasper.version>
     <jasper.pdf.version>7.0.1</jasper.pdf.version>
     <google.zxing.version>3.5.4</google.zxing.version>
-    <java-jwt.version>4.4.0</java-jwt.version>
+    <java-jwt.version>4.4.0</java-jwt.version>    
+    <testcontainers.version>1.21.4</testcontainers.version>
 	</properties>
 	<dependencies>
 	<dependency>
@@ -131,6 +132,17 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>mysql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-suite-engine</artifactId>
             <scope>test</scope>
         </dependency>
 

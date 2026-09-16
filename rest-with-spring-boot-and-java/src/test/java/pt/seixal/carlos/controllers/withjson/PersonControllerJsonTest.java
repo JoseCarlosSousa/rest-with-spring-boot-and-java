@@ -1,7 +1,10 @@
 package pt.seixal.carlos.controllers.withjson;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -18,166 +21,103 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.filter.log.LogDetail;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
-import io.restassured.specification.RequestSpecification;
-import pt.seixal.carlos.config.TestConfigs;
 import pt.seixal.carlos.dto.PersonDTO;
 import pt.seixal.carlos.dto.wrappers.json.WrapperPersonDTO;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class PersonControllerJsonTest  extends AbstractIntegrationTest {
+class PersonControllerJsonTest extends AbstractIntegrationTest {
 
-	private static RequestSpecification especification;
 	private static ObjectMapper objectMapper;
-	private static PersonDTO person;
-	
+
 	@BeforeAll
-	static void setUp(){
+	static void setUp() {
 		objectMapper = new ObjectMapper();
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-		
-		person = new PersonDTO();
 	}
 
 	@Test
 	@Order(1)
 	void createTest() throws JsonMappingException, JsonProcessingException {
+
 		mockPerson();
-		
-		especification = new RequestSpecBuilder()
-				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCALHOST)
-				.setBasePath("/api/person/v1")
-				.setPort(TestConfigs.SERVER_PORT)
-				.addFilter(new RequestLoggingFilter(LogDetail.ALL))
-				.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-				.build();
-		
-		var content = given(especification)
+		setEspecification("person");
+
+		person = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-					.body(person)
+				.body(person)
 				.when()
-					.post()
+				.post()
 				.then()
-					.statusCode(200)
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.statusCode(200)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.extract()
-					.body()
-						.asString();
-		
-		PersonDTO createdPerson = objectMapper.readValue(content, PersonDTO.class);
-		person = createdPerson;
-		
-		assertNotNull(createdPerson);
-		
-		assertNotNull(createdPerson.getId());
-		assertTrue(createdPerson.getId() > 0);
-		
-		assertEquals("Carlos", createdPerson.getFirstName());
-		assertEquals("Seixal", createdPerson.getLastName());
-		assertEquals("Portugal", createdPerson.getAddress());
-		assertEquals("Male", createdPerson.getGender());
-		assertTrue(createdPerson.getEnabled());
-	}	@Test
-	
+				.body()
+				.as(PersonDTO.class);
+
+		checkPerson();
+	}
+
+	@Test
+
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
-		
+
 		person.setLastName("Seixal Updated");
-		
-		var content = given(especification)
+
+		person = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-					.body(person)
+				.body(person)
 				.when()
-					.put()
+				.put()
 				.then()
-					.statusCode(200)
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.statusCode(200)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.extract()
-					.body()
-						.asString();
-		
-		PersonDTO createdPerson = objectMapper.readValue(content, PersonDTO.class);
-		person = createdPerson;
-		
-		assertNotNull(createdPerson);
-		
-		assertNotNull(createdPerson.getId());
-		assertTrue(createdPerson.getId() > 0);
-		
-		assertEquals("Carlos", createdPerson.getFirstName());
-		assertEquals("Seixal Updated", createdPerson.getLastName());
-		assertEquals("Portugal", createdPerson.getAddress());
-		assertEquals("Male", createdPerson.getGender());
-		assertTrue(createdPerson.getEnabled());
+				.body()
+				.as(PersonDTO.class);
+
+		checkPerson("Seixal Updated", true);
 	}
-	
+
 	@Test
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
 
-		var content = given(especification)
+		person = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-					.pathParam("id", person.getId())
+				.pathParam("id", person.getId())
 				.when()
-					.get("{id}")
+				.get("{id}")
 				.then()
-					.statusCode(200)
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.statusCode(200)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.extract()
-					.body()
-						.asString();
-		
-		PersonDTO createdPerson = objectMapper.readValue(content, PersonDTO.class);
-		person = createdPerson;
-		
-		assertNotNull(createdPerson);
-		
-		assertNotNull(createdPerson.getId());
-		assertTrue(createdPerson.getId() > 0);
-		
-		assertEquals("Carlos", createdPerson.getFirstName());
-		assertEquals("Seixal Updated", createdPerson.getLastName());
-		assertEquals("Portugal", createdPerson.getAddress());
-		assertEquals("Male", createdPerson.getGender());
-		assertTrue(createdPerson.getEnabled());
-	}	
-	
+				.body()
+				.as(PersonDTO.class);
+
+		checkPerson("Seixal Updated", true);
+	}
+
 	@Test
 	@Order(4)
 	void disableTest() throws JsonMappingException, JsonProcessingException {
 
-		var content = given(especification)
-					.pathParam("id", person.getId())
+		person = given(especification)
+				.pathParam("id", person.getId())
 				.when()
-					.patch("{id}")
+				.patch("{id}")
 				.then()
-					.statusCode(200)
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.statusCode(200)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.extract()
-					.body()
-						.asString();
-		
-		PersonDTO createdPerson = objectMapper.readValue(content, PersonDTO.class);
-		person = createdPerson;
-		
-		assertNotNull(createdPerson);
-		
-		assertNotNull(createdPerson.getId());
-		assertTrue(createdPerson.getId() > 0);
-		
-		assertEquals("Carlos", createdPerson.getFirstName());
-		assertEquals("Seixal Updated", createdPerson.getLastName());
-		assertEquals("Portugal", createdPerson.getAddress());
-		assertEquals("Male", createdPerson.getGender());
-		assertFalse(createdPerson.getEnabled());
+				.body()
+				.as(PersonDTO.class);
+
+		checkPerson("Seixal Updated", false);
+
 	}
-	
 
 	@Test
 	@Order(5)
@@ -185,12 +125,12 @@ class PersonControllerJsonTest  extends AbstractIntegrationTest {
 
 		given(especification)
 				.pathParam("id", person.getId())
-			.when()
+				.when()
 				.delete("{id}")
-			.then()
+				.then()
 				.statusCode(204);
 	}
-	
+
 	@Test
 	@Order(6)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
@@ -199,70 +139,64 @@ class PersonControllerJsonTest  extends AbstractIntegrationTest {
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.queryParam("page", 1, "size", 10, "direction", "asc")
 				.when()
-					.get()
+				.get()
 				.then()
-					.statusCode(200)
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.statusCode(200)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.extract()
-					.body()
-						.asString();
+				.body()
+				.asString();
 
-		//List<PersonDTO> people = objectMapper.readValue(content, new TypeReference<List<PersonDTO>>() {});
+		// List<PersonDTO> people = objectMapper.readValue(content, new
+		// TypeReference<List<PersonDTO>>() {});
 		WrapperPersonDTO wrapper = objectMapper.readValue(content, WrapperPersonDTO.class);
 		List<PersonDTO> people = wrapper.getEmbedded().getPeople();
-		
+
 		assertNotNull(people);
-		
+
 		PersonDTO person1 = people.get(0);
-		
-		//assertEquals(127, person1.getId());
+
+		// assertEquals(127, person1.getId());
 		assertEquals("Abey", person1.getFirstName());
 		assertEquals("Lebreton", person1.getLastName());
 		assertEquals("Apt 1341", person1.getAddress());
 		assertEquals("Male", person1.getGender());
 		assertTrue(person1.getEnabled());
-		
+
 	}
-	
+
 	@Test
 	@Order(7)
 	void findByNameTest() throws JsonMappingException, JsonProcessingException {
 
-		//api/person/v1/findPeopleByName/and?page=0&size=5&direction=asc
+		// api/person/v1/findPeopleByName/and?page=0&size=5&direction=asc
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.pathParam("firstName", "and")
 				.queryParam("page", 0, "size", 10, "direction", "asc")
 				.when()
-					.get("findPeopleByName/{firstName}")
+				.get("findPeopleByName/{firstName}")
 				.then()
-					.statusCode(200)
-					.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.statusCode(200)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.extract()
-					.body()
-						.asString();
+				.body()
+				.asString();
 
-		//List<PersonDTO> people = objectMapper.readValue(content, new TypeReference<List<PersonDTO>>() {});
+		// List<PersonDTO> people = objectMapper.readValue(content, new
+		// TypeReference<List<PersonDTO>>() {});
 		WrapperPersonDTO wrapper = objectMapper.readValue(content, WrapperPersonDTO.class);
 		List<PersonDTO> people = wrapper.getEmbedded().getPeople();
-		
+
 		assertNotNull(people);
-		
+
 		PersonDTO person1 = people.get(0);
-		
+
 		assertEquals("Aland", person1.getFirstName());
 		assertEquals("Boyn", person1.getLastName());
 		assertEquals("Apt 653", person1.getAddress());
 		assertEquals("Male", person1.getGender());
 		assertFalse(person1.getEnabled());
-		
-	}
-	
-	private void mockPerson() {
-        person.setFirstName("Carlos");
-        person.setLastName("Seixal");
-        person.setAddress("Portugal");
-        person.setGender("Male");
-        person.setEnabled(true);
+
 	}
 }

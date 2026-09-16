@@ -13,43 +13,43 @@ import org.springframework.http.MediaType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-import pt.seixal.carlos.dto.PersonDTO;
+import pt.seixal.carlos.dto.BookDTO;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class PersonControllerCorsTest extends AbstractIntegrationTest {
+public class BookControllerCorsTest extends AbstractIntegrationTest {
 
 	@Test
 	@Order(1)
 	void create() throws JsonMappingException, JsonProcessingException {
 
-		mockPerson();
-		setEspecification("person");
+		mockBook();
+		setEspecification("book");
 
-		person = given(especification)
+		book = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.body(person)
+				.body(book)
 				.when()
 				.post()
 				.then()
 				.statusCode(200)
 				.extract()
 				.body()
-				.as(PersonDTO.class);
+				.as(BookDTO.class);
 
-		checkPerson();
+		checkBook();
 	}
 
 	@Test
 	@Order(2)
 	void creatWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
 
-		setEspecificationBadOrigin("person");
+		setEspecificationBadOrigin("book");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.body(person)
+				.body(book)
 				.when()
 				.post()
 				.then()
@@ -65,31 +65,31 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest {
 	@Order(3)
 	void findById() throws JsonMappingException, JsonProcessingException {
 
-		setEspecification("person");
+		setEspecification("book");
 
-		person = given(especification)
+		book = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.pathParam("id", person.getId())
+				.pathParam("id", book.getId())
 				.when()
 				.get("{id}")
 				.then()
 				.statusCode(200)
 				.extract()
 				.body()
-				.as(PersonDTO.class);
+				.as(BookDTO.class);
 
-		checkPerson();
+		checkBook();
 
 	}
 
 	@Test
 	@Order(4)
 	void findByIdWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
-		setEspecificationBadOrigin("person");
+		setEspecificationBadOrigin("book");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.pathParam("id", person.getId())
+				.pathParam("id", book.getId())
 				.when()
 				.get("{id}")
 				.then()

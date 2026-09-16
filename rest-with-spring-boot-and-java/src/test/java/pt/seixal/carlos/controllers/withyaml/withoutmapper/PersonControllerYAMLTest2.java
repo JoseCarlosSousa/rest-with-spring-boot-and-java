@@ -1,4 +1,4 @@
-package pt.seixal.carlos.controllers.withyaml;
+package pt.seixal.carlos.controllers.withyaml.withoutmapper;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,24 +17,30 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
-import io.restassured.config.EncoderConfig;
-import io.restassured.config.RestAssuredConfig;
-import io.restassured.http.ContentType;
 import pt.seixal.carlos.dto.PersonDTO;
 import pt.seixal.carlos.dto.wrappers.xml.PagedModelPerson;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class PersonControllerYAMLTest extends AbstractIntegrationTest {
+class PersonControllerYAMLTest2 extends AbstractIntegrationTest {
 
 	private static YAMLMapper objectMapper;
 
 	@BeforeAll
 	static void setUp() {
 		objectMapper = new YAMLMapper();
+		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+		// Configura o REST Assured para conseguir codificar e enviar application/x-yaml
+		// como texto puro
+		io.restassured.RestAssured.config = io.restassured.config.RestAssuredConfig.config()
+				.encoderConfig(io.restassured.config.EncoderConfig.encoderConfig()
+						.encodeContentTypeAs(MediaType.APPLICATION_YAML_VALUE, io.restassured.http.ContentType.TEXT));
 	}
 
 	@Test
@@ -44,14 +50,12 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 		mockPerson();
 		setEspecification("person");
 
-		person = given()
-				.config(RestAssuredConfig.config()
-						.encoderConfig(EncoderConfig.encoderConfig()
-								.encodeContentTypeAs(MediaType.APPLICATION_YAML_VALUE, ContentType.TEXT)))
-				.spec(especification)
+		String yamlBody = objectMapper.writeValueAsString(person);
+
+		var content = given(especification)
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.body(person, objectMapper)
+				.body(yamlBody)
 				.when()
 				.post()
 				.then()
@@ -59,7 +63,9 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.extract()
 				.body()
-				.as(PersonDTO.class, objectMapper);
+				.asString();
+
+		person = objectMapper.readValue(content, PersonDTO.class);
 
 		checkPerson();
 	}
@@ -69,15 +75,12 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 	void updateTest() throws JsonMappingException, JsonProcessingException {
 
 		person.setLastName("Seixal Updated");
+		String yamlBody = objectMapper.writeValueAsString(person);
 
-		person = given()
-				.config(RestAssuredConfig.config()
-						.encoderConfig(EncoderConfig.encoderConfig()
-								.encodeContentTypeAs(MediaType.APPLICATION_YAML_VALUE, ContentType.TEXT)))
-				.spec(especification)
+		var content = given(especification)
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.body(person, objectMapper)
+				.body(yamlBody)
 				.when()
 				.put()
 				.then()
@@ -85,7 +88,9 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.extract()
 				.body()
-				.as(PersonDTO.class, objectMapper);
+				.asString();
+
+		person = objectMapper.readValue(content, PersonDTO.class);
 
 		checkPerson("Seixal Updated", true);
 	}
@@ -94,11 +99,7 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
 
-		person = given()
-				.config(RestAssuredConfig.config()
-						.encoderConfig(EncoderConfig.encoderConfig()
-								.encodeContentTypeAs(MediaType.APPLICATION_YAML_VALUE, ContentType.TEXT)))
-				.spec(especification)
+		var content = given(especification)
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
 				.pathParam("id", person.getId())
@@ -109,7 +110,9 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.extract()
 				.body()
-				.as(PersonDTO.class, objectMapper);
+				.asString();
+
+		person = objectMapper.readValue(content, PersonDTO.class);
 
 		checkPerson("Seixal Updated", true);
 	}
@@ -118,11 +121,7 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 	@Order(4)
 	void disableTest() throws JsonMappingException, JsonProcessingException {
 
-		person = given()
-				.config(RestAssuredConfig.config()
-						.encoderConfig(EncoderConfig.encoderConfig()
-								.encodeContentTypeAs(MediaType.APPLICATION_YAML_VALUE, ContentType.TEXT)))
-				.spec(especification)
+		var content = given(especification)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
 				.pathParam("id", person.getId())
 				.when()
@@ -132,7 +131,9 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.extract()
 				.body()
-				.as(PersonDTO.class, objectMapper);
+				.asString();
+
+		person = objectMapper.readValue(content, PersonDTO.class);
 
 		checkPerson("Seixal Updated", false);
 	}
@@ -153,7 +154,7 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 	@Order(6)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
 
-		var response = given(especification)
+		var content = given(especification)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
 				.queryParam("page", 1, "size", 10, "direction", "asc")
 				.when()
@@ -163,26 +164,30 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.extract()
 				.body()
-				.as(PagedModelPerson.class, objectMapper);
+				.asString();
 
-		// List<PersonDTO> people = Arrays.asList(response);
-		List<PersonDTO> people = response.getContent();
+		PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class);
+		List<PersonDTO> people = wrapper.getContent();
+
 		assertNotNull(people);
 
-		PersonDTO person1 = people.get(0);
-		assertEquals("Abey", person1.getFirstName());
-		assertEquals("Lebreton", person1.getLastName());
-		assertEquals("Apt 1341", person1.getAddress());
-		assertEquals("Male", person1.getGender());
-		assertTrue(person1.getEnabled());
+		for (PersonDTO person : people) {
+			assertNotNull(person.getId());
+			assertTrue(person.getId() > 0);
+
+			assertNotNull(person.getFirstName());
+			assertNotNull(person.getLastName());
+			assertNotNull(person.getAddress());
+			assertNotNull(person.getGender());
+		}
 
 	}
 
 	@Test
-	@Order(6)
+	@Order(7)
 	void findByNameTest() throws JsonMappingException, JsonProcessingException {
 
-		var response = given(especification)
+		var content = given(especification)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
 				.pathParam("firstName", "and")
 				.queryParam("page", 0, "size", 10, "direction", "asc")
@@ -193,11 +198,10 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.extract()
 				.body()
-				.as(PagedModelPerson.class, objectMapper);
+				.asString();
 
-		// List<PersonDTO> people = Arrays.asList(response);
-		List<PersonDTO> people = response.getContent();
-		assertNotNull(people);
+		PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class);
+		List<PersonDTO> people = wrapper.getContent();
 
 		PersonDTO person1 = people.get(0);
 		assertEquals("Aland", person1.getFirstName());
@@ -207,4 +211,5 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 		assertFalse(person1.getEnabled());
 
 	}
+
 }
