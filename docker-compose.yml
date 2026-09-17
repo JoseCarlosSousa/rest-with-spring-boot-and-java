@@ -25,6 +25,8 @@ services:
       SPRING.DATASOURCE.URL: jdbc:mysql://db:3306/spring_boot_starter_data_jpa?useTimezone=true&serverTimezone=UTC
       SPRING.DATASOURCE.USERNAME: root
       SPRING.DATASOURCE.PASSWORD: rootroot
+      EMAIL_USERNAME: ${EMAIL_USERNAME}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
     command: mvn spring-boot:run
     ports:
       - "80:80"

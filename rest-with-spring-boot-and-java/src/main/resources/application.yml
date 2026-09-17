@@ -57,9 +57,11 @@ logging:
     root: INFO
     #net.sf.jasperreports.engine.*: TRACE
 
-spring-doc:
+springdoc:
   paths-to-scan:
     - /auth/**
     - /api/**/v1/**
   swagger-ui:
+    tagsSorter: alpha
+    operationsSorter: method
     use-root-path: true

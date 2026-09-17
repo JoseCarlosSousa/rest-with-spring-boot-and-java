@@ -50,21 +50,36 @@ public class SecurityConfig {
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		var filter = new JwtTokenFilter(tokenProvider);
-		return http.httpBasic(AbstractHttpConfigurer::disable).csrf(AbstractHttpConfigurer::disable)
+
+		http
+				.httpBasic(AbstractHttpConfigurer::disable)
+				.csrf(AbstractHttpConfigurer::disable)
 				.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(authorizeHttpRequest -> authorizeHttpRequest
 						.requestMatchers(
 								"/auth/signin",
 								"/auth/refresh/**",
-								"/auth/createUser",
+								// "/auth/createUser",
 								"/swagger-ui/**",
 								"/v3/api-docs/**")
 						.permitAll()
 						.requestMatchers("/api/**").authenticated()
+						.requestMatchers("/auth/createUser").authenticated()
 						.requestMatchers("/users").denyAll())
 				.cors(cors -> {
 				})
-				.build();
+				// CORREÇÃO: Adiciona o ponto de entrada para capturar acessos sem token ou com
+				// token expirado
+				.exceptionHandling(exception -> exception
+						.authenticationEntryPoint((request, response, authException) -> {
+							response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
+							response.setContentType("application/json;charset=UTF-8");
+							response.getWriter().write(
+									"{\"message\": \"O token JWT expirou ou é inválido. Por favor, faça login novamente.\"}");
+						}));
+
+		return http.build();
 	}
+
 }

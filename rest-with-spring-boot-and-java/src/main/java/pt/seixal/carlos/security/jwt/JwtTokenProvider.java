@@ -18,6 +18,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 
@@ -63,14 +65,12 @@ public class JwtTokenProvider {
 			tmpToken = refreshToken.substring(BEARER.length());
 		}
 
-		var decodedJWT = getJWTDecoted(tmpToken);
+		var decodedJWT = decodedToken(tmpToken);
 
 		var username = decodedJWT.getSubject();
 		List<String> roles = decodedJWT.getClaim("roles").asList(String.class);
 
-		return
-
-		createAccessToken(username, roles);
+		return createAccessToken(username, roles);
 	}
 
 	private String getRefreshToken(String username, List<String> roles, Date now) {
@@ -116,20 +116,19 @@ public class JwtTokenProvider {
 				return false;
 			}
 			return true;
+		} catch (TokenExpiredException e) {
+			logger.warn("O token JWT fornecido já expirou.");
+		} catch (JWTVerificationException e) {
+			logger.warn("O token JWT fornecido é inválido.");
 		} catch (Exception e) {
-			logger.error("Expired or Invalid JWT Token!", e);
+			logger.error("Erro inesperado ao validar o token JWT.");
 		}
 		return false;
 	}
 
 	private DecodedJWT decodedToken(String token) {
-		return getJWTDecoted(token);
-	}
-
-	private DecodedJWT getJWTDecoted(String token) {
 		JWTVerifier verifier = JWT.require(algorithm).build();
-		var decodedJWT = verifier.verify(token);
-		return decodedJWT;
+		return verifier.verify(token);
 	}
 
 	private boolean checkTokenContainsBears(String token) {
