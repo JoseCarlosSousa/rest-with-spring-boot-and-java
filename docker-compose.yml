@@ -1,0 +1,38 @@
+services:
+  db:
+    image: mysql:latest
+    platform: linux/amd64
+    restart: always
+    environment:
+      TZ: Europe/Lisbon
+      MYSQL_ROOT_PASSWORD: rootroot
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: rootroot
+      MYSQL_DATABASE: spring_boot_starter_data_jpa
+    ports:
+      - "3308:3306"
+    expose:
+      - 3306
+    networks:
+      - carlos-network
+  spring-boot-starter-data-jpa:
+    image: kkosmico/spring-boot-starter-data-jpa
+    restart: always
+    build: ./rest-with-spring-boot-and-java
+    working_dir: /rest-with-spring-boot-and-java
+    environment:
+      TZ: Europe/Lisbon
+      SPRING.DATASOURCE.URL: jdbc:mysql://db:3306/spring_boot_starter_data_jpa?useTimezone=true&serverTimezone=UTC
+      SPRING.DATASOURCE.USERNAME: root
+      SPRING.DATASOURCE.PASSWORD: rootroot
+    command: mvn spring-boot:run
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+    networks:
+      - carlos-network
+networks:
+  carlos-network:
+    driver: bridge
+
