@@ -51,11 +51,6 @@ public class AuthController implements AuthControllerDocs {
 		return ResponseEntity.ok().body(token);
 	}
 
-	@Override
-	public AccountCredentialsDTO createUser(@RequestBody AccountCredentialsDTO credentials) {
-		return service.create(credentials);
-	}
-
 	private boolean checkIfInvalid(String value1, String value2) {
 		return StringUtils.isBlank(value1) || StringUtils.isBlank(value1);
 	}

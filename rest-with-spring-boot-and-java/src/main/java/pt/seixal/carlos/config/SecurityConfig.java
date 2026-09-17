@@ -60,12 +60,10 @@ public class SecurityConfig {
 						.requestMatchers(
 								"/auth/signin",
 								"/auth/refresh/**",
-								// "/auth/createUser",
 								"/swagger-ui/**",
 								"/v3/api-docs/**")
 						.permitAll()
 						.requestMatchers("/api/**").authenticated()
-						.requestMatchers("/auth/createUser").authenticated()
 						.requestMatchers("/users").denyAll())
 				.cors(cors -> {
 				})
