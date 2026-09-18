@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import pt.seixal.carlos.dto.PersonDTO;
+import pt.seixal.carlos.data.dto.v1.PersonDTO;
 import pt.seixal.carlos.dto.wrappers.json.WrapperPersonDTO;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 

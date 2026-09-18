@@ -5,7 +5,7 @@ import java.util.List;
 
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import pt.seixal.carlos.dto.BookDTO;
+import pt.seixal.carlos.data.dto.v1.BookDTO;
 
 @XmlRootElement
 public class PagedModelBook implements Serializable {

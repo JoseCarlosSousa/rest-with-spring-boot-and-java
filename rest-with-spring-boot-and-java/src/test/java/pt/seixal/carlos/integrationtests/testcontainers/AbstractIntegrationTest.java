@@ -30,10 +30,10 @@ import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
 import pt.seixal.carlos.config.TestConfigs;
-import pt.seixal.carlos.dto.AccountCredentialsDTO;
-import pt.seixal.carlos.dto.BookDTO;
-import pt.seixal.carlos.dto.PersonDTO;
-import pt.seixal.carlos.dto.TokenDTO;
+import pt.seixal.carlos.data.dto.v1.BookDTO;
+import pt.seixal.carlos.data.dto.v1.PersonDTO;
+import pt.seixal.carlos.data.dto.v1.security.AccountCredentialsDTO;
+import pt.seixal.carlos.data.dto.v1.security.TokenDTO;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @ContextConfiguration(initializers = AbstractIntegrationTest.Initializer.class)

@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import io.restassured.config.EncoderConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.http.ContentType;
-import pt.seixal.carlos.dto.PersonDTO;
+import pt.seixal.carlos.data.dto.v1.PersonDTO;
 import pt.seixal.carlos.dto.wrappers.xml.PagedModelPerson;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 

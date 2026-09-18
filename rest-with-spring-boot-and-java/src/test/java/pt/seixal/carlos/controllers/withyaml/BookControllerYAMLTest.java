@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import io.restassured.config.EncoderConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.http.ContentType;
-import pt.seixal.carlos.dto.BookDTO;
+import pt.seixal.carlos.data.dto.v1.BookDTO;
 import pt.seixal.carlos.dto.wrappers.xml.PagedModelBook;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 

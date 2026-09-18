@@ -8,67 +8,71 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
 import pt.seixal.carlos.model.Book;
 
+@JsonIgnoreProperties(value = { "links" }, ignoreUnknown = true)
+@XmlRootElement(name = "PersonDTO")
 @Relation(collectionRelation = "people")
 public class PersonDTO extends RepresentationModel<PersonDTO> implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private Long id;
-    private String firstName;
-    private String lastName;
-    private String address;
-    private String gender;
-    private Boolean enabled;
-    private String profileUrl;
-    private String photoUrl;
-    @JsonIgnore
-    private List<Book> books;
+	private Long id;
+	private String firstName;
+	private String lastName;
+	private String address;
+	private String gender;
+	private Boolean enabled;
+	private String profileUrl;
+	private String photoUrl;
+	@JsonIgnore
+	private List<Book> books;
 
-    public PersonDTO() {
-    }
+	public PersonDTO() {
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public String getFirstName() {
-        return firstName;
-    }
+	public String getFirstName() {
+		return firstName;
+	}
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
 
-    public String getLastName() {
-        return lastName;
-    }
+	public String getLastName() {
+		return lastName;
+	}
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
 
-    public String getAddress() {
-        return address;
-    }
+	public String getAddress() {
+		return address;
+	}
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
+	public void setAddress(String address) {
+		this.address = address;
+	}
 
-    public String getGender() {
-        return gender;
-    }
+	public String getGender() {
+		return gender;
+	}
 
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
 
 	public Boolean getEnabled() {
 		return enabled;
@@ -78,7 +82,7 @@ public class PersonDTO extends RepresentationModel<PersonDTO> implements Seriali
 		this.enabled = enabled;
 	}
 
-    @JsonIgnore
+	@JsonIgnore
 	public String getName() {
 		return firstName != null ? firstName : "" + (lastName != null ? lastName : "");
 	}
@@ -118,14 +122,12 @@ public class PersonDTO extends RepresentationModel<PersonDTO> implements Seriali
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null || !super.equals(obj) || getClass() != obj.getClass()) {
 			return false;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		}
 		PersonDTO other = (PersonDTO) obj;
 		return Objects.equals(address, other.address) && Objects.equals(books, other.books)
 				&& Objects.equals(enabled, other.enabled) && Objects.equals(firstName, other.firstName)
@@ -133,8 +135,5 @@ public class PersonDTO extends RepresentationModel<PersonDTO> implements Seriali
 				&& Objects.equals(lastName, other.lastName) && Objects.equals(photoUrl, other.photoUrl)
 				&& Objects.equals(profileUrl, other.profileUrl);
 	}
-
-
-
 
 }

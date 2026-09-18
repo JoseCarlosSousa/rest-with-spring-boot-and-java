@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import pt.seixal.carlos.config.TestConfigs;
-import pt.seixal.carlos.dto.TokenDTO;
+import pt.seixal.carlos.data.dto.v1.security.TokenDTO;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)

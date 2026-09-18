@@ -5,13 +5,13 @@ import java.util.List;
 
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import pt.seixal.carlos.dto.PersonDTO;
+import pt.seixal.carlos.data.dto.v1.PersonDTO;
 
 @XmlRootElement
 public class PagedModelPerson implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@XmlElement(name = "content")
 	public List<PersonDTO> content;
 
@@ -25,5 +25,5 @@ public class PagedModelPerson implements Serializable {
 	public void setContent(List<PersonDTO> content) {
 		this.content = content;
 	}
-	
+
 }

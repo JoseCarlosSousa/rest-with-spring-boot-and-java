@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import pt.seixal.carlos.dto.BookDTO;
+import pt.seixal.carlos.data.dto.v1.BookDTO;
 
 public class BookEmbeddedDTO implements Serializable {
 
