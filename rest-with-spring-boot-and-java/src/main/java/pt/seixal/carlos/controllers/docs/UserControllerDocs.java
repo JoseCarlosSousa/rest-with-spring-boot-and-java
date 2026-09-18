@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import pt.seixal.carlos.data.dto.v1.UserDTO;
-import pt.seixal.carlos.data.dto.v1.security.AccountCredentialsDTO;
 
 public interface UserControllerDocs {
 
@@ -53,7 +52,7 @@ public interface UserControllerDocs {
 	})
 	UserDTO findById(@PathVariable("id") Long id);
 
-	@PostMapping(value = "/createUser", consumes = {
+	@PostMapping(value = "/create", consumes = {
 			MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE,
 			MediaType.APPLICATION_YAML_VALUE }, produces = {
@@ -68,7 +67,7 @@ public interface UserControllerDocs {
 					@ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
 					@ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
 			})
-	public UserDTO createUser(AccountCredentialsDTO credentials);
+	public UserDTO create(UserDTO credentials);
 
 	@PutMapping(consumes = {
 			MediaType.APPLICATION_JSON_VALUE,
@@ -94,5 +93,5 @@ public interface UserControllerDocs {
 			@ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
 			@ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
 	})
-	ResponseEntity<?> deleteUser(@PathVariable("id") Long id);
+	ResponseEntity<?> delete(@PathVariable("id") Long id);
 }

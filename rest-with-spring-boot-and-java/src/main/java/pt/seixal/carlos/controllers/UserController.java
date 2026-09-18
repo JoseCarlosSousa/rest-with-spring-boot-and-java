@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import pt.seixal.carlos.controllers.docs.UserControllerDocs;
 import pt.seixal.carlos.data.dto.v1.UserDTO;
-import pt.seixal.carlos.data.dto.v1.security.AccountCredentialsDTO;
 import pt.seixal.carlos.services.UserService;
 
 @RestController
@@ -30,12 +29,12 @@ public class UserController implements UserControllerDocs {
 
 	@Override
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public UserDTO createUser(@RequestBody AccountCredentialsDTO credentials) {
+	public UserDTO create(@RequestBody UserDTO credentials) {
 		return service.create(credentials);
 	}
 
 	@Override
-	@PreAuthorize("hasAuthority('ADMIN','MANAGER')")
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGER')")
 	public ResponseEntity<PagedModel<EntityModel<UserDTO>>> findAll(
 			@RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestParam(value = "size", defaultValue = "12") int size,
@@ -46,20 +45,20 @@ public class UserController implements UserControllerDocs {
 	}
 
 	@Override
-	@PreAuthorize("hasAuthority('ADMIN','MANAGER')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
 	public UserDTO findById(Long id) {
-		return null;
+		return service.findById(id);
 	}
 
 	@Override
-	@PreAuthorize("hasAuthority('ADMIN','MANAGER')")
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGER')")
 	public UserDTO update(UserDTO user) {
-		return null;
+		return service.update(user);
 	}
 
 	@Override
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public ResponseEntity<?> deleteUser(Long id) {
+	public ResponseEntity<?> delete(Long id) {
 		service.delete(id);
 		return ResponseEntity.noContent().build();
 	}

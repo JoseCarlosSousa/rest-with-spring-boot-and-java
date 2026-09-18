@@ -39,7 +39,7 @@ public class AuthControllerTest extends AbstractIntegrationTest {
 				.basePath("/auth/refresh")
 				.port(TestConfigs.SERVER_PORT)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.pathParam("username", "leandro")
+				.pathParam("username", "carlos")
 				.header("Authorization", "Bearer " + refreshAccessToken)
 				.when()
 				.put("{username}")

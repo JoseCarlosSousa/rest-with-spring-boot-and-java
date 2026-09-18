@@ -12,7 +12,6 @@ public class AccountCredentialsDTO implements Serializable {
 
 	private String username;
 	private String password;
-	private String fullName;
 
 	public AccountCredentialsDTO() {
 	}
@@ -20,12 +19,6 @@ public class AccountCredentialsDTO implements Serializable {
 	public AccountCredentialsDTO(String username, String password) {
 		this.username = username;
 		this.password = password;
-	}
-
-	public AccountCredentialsDTO(String username, String password, String fullName) {
-		this.username = username;
-		this.password = password;
-		this.fullName = fullName;
 	}
 
 	public String getUsername() {
@@ -44,17 +37,9 @@ public class AccountCredentialsDTO implements Serializable {
 		this.password = password;
 	}
 
-	public String getFullName() {
-		return fullName;
-	}
-
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
-
 	@Override
 	public int hashCode() {
-		return Objects.hash(fullName, password, username);
+		return Objects.hash(password, username);
 	}
 
 	@Override
@@ -62,12 +47,11 @@ public class AccountCredentialsDTO implements Serializable {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null || getClass() != obj.getClass()) {
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
 		}
 		AccountCredentialsDTO other = (AccountCredentialsDTO) obj;
-		return Objects.equals(fullName, other.fullName) && Objects.equals(password, other.password)
-				&& Objects.equals(username, other.username);
+		return Objects.equals(password, other.password) && Objects.equals(username, other.username);
 	}
 
 }

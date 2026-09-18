@@ -1,8 +1,9 @@
 package pt.seixal.carlos.services;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static pt.seixal.carlos.mapper.ObjectMapper.parseObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,6 @@ import org.springframework.stereotype.Service;
 
 import pt.seixal.carlos.controllers.UserController;
 import pt.seixal.carlos.data.dto.v1.UserDTO;
-import pt.seixal.carlos.data.dto.v1.security.AccountCredentialsDTO;
 import pt.seixal.carlos.exceptions.RequiredObjectIsNullException;
 import pt.seixal.carlos.exceptions.ResourceNotFoundException;
 import pt.seixal.carlos.model.Permission;
@@ -71,34 +71,82 @@ public class UserService implements UserDetailsService {
 		repository.delete(entity);
 	}
 
-	private User getUser(Long id) {
-		logger.info("Getting User with id: {}", id);
-		return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No record found for this id"));
-	}
-
-	public UserDTO create(AccountCredentialsDTO user) {
+	public UserDTO create(UserDTO dto) {
 		logger.info("Creating a new user");
-		if (user == null) {
+		if (dto == null) {
 			throw new RequiredObjectIsNullException();
 		}
 
-		var entity = new User();
-		entity.setFullName(user.getFullName());
-		entity.setUserName(user.getUsername());
-		entity.setPassword(generateHashedPassword(user.getPassword()));
-		entity.setAccountNonExpired(true);
-		entity.setAccountNonLocked(true);
-		entity.setCredentialsNonExpired(true);
-		entity.setEnabled(true);
-		if (user.getRole() != null) {
-			List<Permission> persistedPermissions = new ArrayList<>();
-			Permission persisted = permissionRepository.findByDescription(user.getRole())
-					.orElseThrow(() -> new ResourceNotFoundException("Permission not found: " + user.getRole()));
-			persistedPermissions.add(persisted);
-			entity.setPermissions(persistedPermissions);
+		return save(dto, null);
+	}
+
+	public UserDTO update(UserDTO dto) {
+		logger.info("Edit User");
+
+		if (dto == null) {
+			throw new RequiredObjectIsNullException();
 		}
 
-		return parseObject(repository.save(entity), UserDTO.class);
+		User entity = getUser(dto.getId());
+		return save(dto, entity);
+	}
+
+	private UserDTO save(UserDTO dto, User entity) {
+		if (dto == null) {
+			throw new RequiredObjectIsNullException();
+		}
+
+		if (entity == null) {
+			entity = new User();
+			entity.setUserName(dto.getUserName());
+			entity.setAccountNonExpired(true);
+			entity.setAccountNonLocked(true);
+			entity.setCredentialsNonExpired(true);
+		}
+		entity.setFullName(dto.getFullName());
+		entity.setPassword(generateHashedPassword(dto.getPassword()));
+		entity.setEnabled(dto.isEnabled());
+
+		List<String> permissionNames = dto.getPermissions().stream()
+				.map(Permission::getAuthority) // or .getDescription()
+				.toList();
+		List<Permission> bdPermissions = permissionRepository.findByDescriptionIn(permissionNames);
+		entity.setPermissions(bdPermissions);
+
+		var userDTO = parseObject(repository.save(entity), UserDTO.class);
+		addHateoasLinks(userDTO);
+		return userDTO;
+	}
+
+	public PagedModel<EntityModel<UserDTO>> findAll(Pageable pageable) {
+		logger.info("Finding all users!");
+
+		var users = repository.findAll(pageable);
+
+		var peopleWithLinks = users.map(user -> {
+			var dto = parseObject(user, UserDTO.class);
+			addHateoasLinks(dto);
+			return dto;
+		});
+
+		Link findAllLink = WebMvcLinkBuilder.linkTo(
+				WebMvcLinkBuilder.methodOn(UserController.class)
+						.findAll(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().toString()))
+				.withSelfRel();
+
+		return assembler.toModel(peopleWithLinks, findAllLink);
+	}
+
+	public UserDTO findById(Long id) {
+		logger.info("Finding one User!");
+		var dto = parseObject(getUser(id), UserDTO.class);
+		addHateoasLinks(dto);
+		return dto;
+	}
+
+	private User getUser(Long id) {
+		logger.info("Getting User with id: {}", id);
+		return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No record found for this id"));
 	}
 
 	private String generateHashedPassword(String password) {
@@ -111,22 +159,11 @@ public class UserService implements UserDetailsService {
 		return passwordEncoder.encode(password);
 	}
 
-	public PagedModel<EntityModel<UserDTO>> findAll(Pageable pageable) {
-		logger.info("Finding all users!");
-
-		var users = repository.findAll(pageable);
-
-		var peopleWithLinks = users.map(user -> {
-			var dto = parseObject(user, UserDTO.class);
-			return dto;
-		});
-
-		Link findAllLink = WebMvcLinkBuilder.linkTo(
-				WebMvcLinkBuilder.methodOn(UserController.class)
-						.findAll(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().toString()))
-				.withSelfRel();
-
-		return assembler.toModel(peopleWithLinks, findAllLink);
+	private void addHateoasLinks(UserDTO dto) {
+		dto.add(linkTo(methodOn(UserController.class).findById(dto.getId())).withSelfRel().withType("GET"));
+		dto.add(linkTo(methodOn(UserController.class).findAll(0, 12, "asc")).withRel("findAll").withType("GET"));
+		dto.add(linkTo(methodOn(UserController.class).create(dto)).withRel("create").withType("POST"));
+		dto.add(linkTo(methodOn(UserController.class).update(dto)).withRel("update").withType("PUT"));
+		dto.add(linkTo(methodOn(UserController.class).delete(dto.getId())).withRel("delete").withType("DELETE"));
 	}
-
 }

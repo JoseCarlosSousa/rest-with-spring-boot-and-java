@@ -52,7 +52,7 @@ public abstract class AbstractIntegrationTest {
 		book = new BookDTO();
 
 		if (sharedAccessToken == null || sharedAccessToken.isBlank()) {
-			var credentials = new AccountCredentialsDTO("leandro", "admin123");
+			var credentials = new AccountCredentialsDTO("carlos", "admin123");
 
 			TokenDTO loginResult = given()
 					.basePath("/auth/signin")
