@@ -4,7 +4,6 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -69,7 +68,6 @@ public interface UserControllerDocs {
 					@ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
 					@ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
 			})
-	@PreAuthorize("hasRole('ADMIN')")
 	public UserDTO createUser(AccountCredentialsDTO credentials);
 
 	@PutMapping(consumes = {

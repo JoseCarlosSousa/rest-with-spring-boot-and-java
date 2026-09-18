@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,11 +29,13 @@ public class UserController implements UserControllerDocs {
 	UserService service;
 
 	@Override
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public UserDTO createUser(@RequestBody AccountCredentialsDTO credentials) {
 		return service.create(credentials);
 	}
 
 	@Override
+	@PreAuthorize("hasAuthority('ADMIN','MANAGER')")
 	public ResponseEntity<PagedModel<EntityModel<UserDTO>>> findAll(
 			@RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestParam(value = "size", defaultValue = "12") int size,
@@ -43,16 +46,19 @@ public class UserController implements UserControllerDocs {
 	}
 
 	@Override
+	@PreAuthorize("hasAuthority('ADMIN','MANAGER')")
 	public UserDTO findById(Long id) {
 		return null;
 	}
 
 	@Override
+	@PreAuthorize("hasAuthority('ADMIN','MANAGER')")
 	public UserDTO update(UserDTO user) {
 		return null;
 	}
 
 	@Override
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<?> deleteUser(Long id) {
 		service.delete(id);
 		return ResponseEntity.noContent().build();

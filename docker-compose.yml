@@ -3,6 +3,11 @@ services:
     image: mysql:latest
     platform: linux/amd64
     restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     environment:
       TZ: Europe/Lisbon
       MYSQL_ROOT_PASSWORD: rootroot
@@ -31,7 +36,8 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - carlos-network
 networks:

@@ -9,7 +9,7 @@ import org.springframework.hateoas.server.core.Relation;
 
 import pt.seixal.carlos.model.Permission;
 
-@Relation(collectionRelation = "books")
+@Relation(collectionRelation = "users")
 public class UserDTO extends RepresentationModel<UserDTO> implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -120,7 +120,7 @@ public class UserDTO extends RepresentationModel<UserDTO> implements Serializabl
 		if (this == obj) {
 			return true;
 		}
-		if ((obj == null) || !super.equals(obj) || (getClass() != obj.getClass())) {
+		if (obj == null || !super.equals(obj) || getClass() != obj.getClass()) {
 			return false;
 		}
 		UserDTO other = (UserDTO) obj;
