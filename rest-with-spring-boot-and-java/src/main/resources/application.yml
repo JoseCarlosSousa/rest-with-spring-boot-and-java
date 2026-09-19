@@ -10,7 +10,8 @@ security:
   jwt:
     token:
       secret-key: 53cr37
-      expire-length: 3600000
+      expire-length: 86400000          # 1 Dia em milissegundos
+      refresh-expire-length: 604800000 # 1 Semana (7 Dias) em milissegundos
 
 email:
   subject: "Default Subject"

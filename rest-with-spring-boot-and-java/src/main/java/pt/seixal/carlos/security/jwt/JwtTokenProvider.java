@@ -38,6 +38,9 @@ public class JwtTokenProvider {
 	@Value("${security.jwt.token.expire-length:3600000}")
 	private long validInMilliseconds = 3600000;
 
+	@Value("${security.jwt.token.refresh-expire-length:86400000}")
+	private long refreshValidInMilliseconds = 86400000;
+
 	@Autowired
 	private UserDetailsService userDetailsService;
 
@@ -56,13 +59,14 @@ public class JwtTokenProvider {
 		var validity = new Date(now.getTime() + validInMilliseconds);
 		var accessToken = getAccessToken(username, roles, now, validity);
 		var refreshToken = getRefreshToken(username, roles, now);
+
 		return new TokenDTO(username, true, now, validity, accessToken, refreshToken);
 	}
 
 	public TokenDTO refreshToken(String refreshToken) {
-		var tmpToken = "";
+		var tmpToken = refreshToken;
 		if (checkTokenContainsBears(refreshToken)) {
-			tmpToken = refreshToken.substring(BEARER.length());
+			tmpToken = refreshToken.substring(BEARER.length()).trim();
 		}
 
 		var decodedJWT = decodedToken(tmpToken);
@@ -74,11 +78,11 @@ public class JwtTokenProvider {
 	}
 
 	private String getRefreshToken(String username, List<String> roles, Date now) {
-		var refreshTokenVality = new Date(now.getTime() + validInMilliseconds * 3);
+		var refreshTokenValidity = new Date(now.getTime() + refreshValidInMilliseconds);
 		return JWT.create()
 				.withClaim("roles", roles)
 				.withIssuedAt(now)
-				.withExpiresAt(refreshTokenVality)
+				.withExpiresAt(refreshTokenValidity)
 				.withSubject(username)
 				.sign(algorithm);
 	}

@@ -13,6 +13,7 @@ import io.micrometer.common.util.StringUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import pt.seixal.carlos.controllers.docs.AuthControllerDocs;
 import pt.seixal.carlos.data.dto.v1.security.AccountCredentialsDTO;
+import pt.seixal.carlos.data.dto.v1.security.TokenDTO;
 import pt.seixal.carlos.services.AuthService;
 
 @RestController
@@ -26,14 +27,11 @@ public class AuthController implements AuthControllerDocs {
 	@Override
 	public ResponseEntity<?> signin(@RequestBody AccountCredentialsDTO credentials) {
 
-		if (credentialsInvalid(credentials)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!");
+		ResponseEntity<TokenDTO> token = null;
+		if (!credentialsInvalid(credentials)) {
+			token = service.signIn(credentials);
 		}
-		var token = service.signIn(credentials);
-		if (token == null) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!");
-		}
-		return ResponseEntity.ok().body(token);
+		return token != null ? token : ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!");
 	}
 
 	@Override
@@ -41,18 +39,15 @@ public class AuthController implements AuthControllerDocs {
 			@PathVariable("username") String username,
 			@RequestHeader("Authorization") String refreshToken) {
 
-		if (checkIfInvalid(username, refreshToken)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!");
+		ResponseEntity<TokenDTO> token = null;
+		if (!checkIfInvalid(username, refreshToken)) {
+			token = service.refresh(username, refreshToken);
 		}
-		var token = service.refresh(username, refreshToken);
-		if (token == null) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!");
-		}
-		return ResponseEntity.ok().body(token);
+		return token != null ? token : ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!");
 	}
 
-	private boolean checkIfInvalid(String value1, String value2) {
-		return StringUtils.isBlank(value1) || StringUtils.isBlank(value1);
+	private boolean checkIfInvalid(String username, String value) {
+		return StringUtils.isBlank(username) || StringUtils.isBlank(value);
 	}
 
 	private boolean credentialsInvalid(AccountCredentialsDTO credentials) {

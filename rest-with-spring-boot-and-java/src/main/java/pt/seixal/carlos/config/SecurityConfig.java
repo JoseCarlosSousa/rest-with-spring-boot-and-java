@@ -69,8 +69,6 @@ public class SecurityConfig {
 						.requestMatchers("/users").denyAll())
 				.cors(cors -> {
 				})
-				// CORREÇÃO: Adiciona o ponto de entrada para capturar acessos sem token ou com
-				// token expirado
 				.exceptionHandling(exception -> exception
 						.authenticationEntryPoint((request, response, authException) -> {
 							response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);

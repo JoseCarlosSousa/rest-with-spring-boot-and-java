@@ -29,6 +29,7 @@ public class AuthService {
 	private UserRepository repository;
 
 	public ResponseEntity<TokenDTO> signIn(AccountCredentialsDTO credentials) {
+		logger.info("Login with credentials");
 		authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(credentials.getUsername(), credentials.getPassword()));
 
@@ -43,7 +44,7 @@ public class AuthService {
 	}
 
 	public ResponseEntity<TokenDTO> refresh(String username, String refreshToken) {
-
+		logger.info("Login with refreshToken");
 		var user = repository.findByUsername(username);
 		TokenDTO token;
 		if (user != null) {
