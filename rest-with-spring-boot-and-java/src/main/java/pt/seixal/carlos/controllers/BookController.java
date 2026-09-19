@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,22 +28,22 @@ public class BookController implements BookControllerDocs {
 	}
 
 	@Override
-	public BookDTO findById(@PathVariable("id") Long id) {
+	public BookDTO findById(Long id) {
 		return service.findById(id);
 	}
 
 	@Override
-	public BookDTO create(@RequestBody BookDTO book) {
+	public BookDTO create(BookDTO book) {
 		return service.create(book);
 	}
 
 	@Override
-	public BookDTO update(@RequestBody BookDTO book) {
+	public BookDTO update(BookDTO book) {
 		return service.update(book);
 	}
 
 	@Override
-	public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+	public ResponseEntity<?> delete(Long id) {
 		service.delete(id);
 		return ResponseEntity.noContent().build();
 	}
