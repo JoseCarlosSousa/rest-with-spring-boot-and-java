@@ -1,6 +1,6 @@
 package pt.seixal.carlos.unitetests.mapper;
-import static pt.seixal.carlos.mapper.ObjectMapper.parseListObjects;
-import static pt.seixal.carlos.mapper.ObjectMapper.parseObject;
+import static pt.seixal.carlos.mapper.DozertMapper.parseListObjects;
+import static pt.seixal.carlos.mapper.DozertMapper.parseObject;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;

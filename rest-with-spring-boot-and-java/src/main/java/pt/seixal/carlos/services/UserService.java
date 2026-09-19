@@ -2,7 +2,7 @@ package pt.seixal.carlos.services;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-import static pt.seixal.carlos.mapper.ObjectMapper.parseObject;
+import static pt.seixal.carlos.mapper.DozertMapper.parseObject;
 
 import java.util.HashMap;
 import java.util.List;

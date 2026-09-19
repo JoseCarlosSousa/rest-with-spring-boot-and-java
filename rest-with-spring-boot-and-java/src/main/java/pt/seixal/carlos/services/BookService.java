@@ -2,17 +2,19 @@ package pt.seixal.carlos.services;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-import static pt.seixal.carlos.mapper.ObjectMapper.parseObject;
+import static pt.seixal.carlos.mapper.DozertMapper.parseObject;
+
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Service;
 
 import pt.seixal.carlos.controllers.BookController;
@@ -21,88 +23,98 @@ import pt.seixal.carlos.exceptions.RequiredObjectIsNullException;
 import pt.seixal.carlos.exceptions.ResourceNotFoundException;
 import pt.seixal.carlos.model.Book;
 import pt.seixal.carlos.repository.BookRepository;
+import pt.seixal.carlos.util.PageableUtils;
+import pt.seixal.carlos.util.PagedModelUtils;
 
 @Service
 public class BookService {
 
-    private final Logger logger = LoggerFactory.getLogger(BookService.class);
+	private final Logger logger = LoggerFactory.getLogger(BookService.class);
 
-    @Autowired
-    BookRepository repository;
+	@Autowired
+	BookRepository repository;
 
-    @Autowired
-    PagedResourcesAssembler<BookDTO> assembler;
-    
-    public PagedModel<EntityModel<BookDTO>> findAll(Pageable pageable) {
-        logger.info("Finding all books!");
-        
-        var books = repository.findAll(pageable);
-        
-		var peopleWithLinks = books.map(book -> {
-			var dto = parseObject(book, BookDTO.class);
-			addHateoasLinks(dto);
-			return dto;
-		});
-		
-		Link findAllLink = WebMvcLinkBuilder.linkTo(
-				WebMvcLinkBuilder.methodOn(BookController.class)
-				.findAll(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().toString()))
-				.withSelfRel();
-		
-        return assembler.toModel(peopleWithLinks, findAllLink);
-    }
+	@Autowired
+	PagedResourcesAssembler<BookDTO> assembler;
 
-    public BookDTO findById(Long id) {
-        logger.info("Finding one Book!");
-        var dto = parseObject(getBook(id), BookDTO.class);
-        addHateoasLinks(dto);
-        return dto;
-    }
+	public PagedModel<EntityModel<BookDTO>> findAll(Map<String, String> params) {
+		logger.info("Finding all books!");
 
-    public BookDTO create(BookDTO book) {
-        logger.info("Creating Book");
-        if (book == null) throw new RequiredObjectIsNullException();
+		Pageable pageable = PageableUtils.getPageable(params);
+		return buildPageModel(params, repository.findAll(pageable));
+	}
 
-        var entity = parseObject(book, Book.class);
-        var dto = parseObject(repository.save(entity), BookDTO.class);
-        addHateoasLinks(dto);
-        return dto;
-    }
+	public BookDTO findById(Long id) {
+		logger.info("Finding one Book!");
+		var dto = parseObject(getBook(id), BookDTO.class);
+		addHateoasLinks(dto);
+		return dto;
+	}
 
-    private Book getBook(Long id) {
-        logger.info("Getting Book with id: {}", id);
-        return repository.findById(id).orElseThrow(() ->  new ResourceNotFoundException("No record found for this id"));
-    }
+	public BookDTO create(BookDTO book) {
+		logger.info("Creating Book");
+		if (book == null) {
+			throw new RequiredObjectIsNullException();
+		}
 
-    public BookDTO update(BookDTO book) {
-        logger.info("Edit Book");
+		var entity = parseObject(book, Book.class);
+		var dto = parseObject(repository.save(entity), BookDTO.class);
+		addHateoasLinks(dto);
+		return dto;
+	}
 
-        if (book == null) throw new RequiredObjectIsNullException();
+	private Book getBook(Long id) {
+		logger.info("Getting Book with id: {}", id);
+		return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No record found for this id"));
+	}
 
-        Book entity = getBook(book.getId());
-        entity.setAuthor(book.getAuthor());
-        entity.setLaunchDate(book.getLaunchDate());
-        entity.setPrice(book.getPrice());
-        entity.setTitle(book.getTitle());
+	public BookDTO update(BookDTO book) {
+		logger.info("Edit Book");
 
-        var dto = parseObject(repository.save(entity), BookDTO.class);
-        addHateoasLinks(dto);
-        return dto;
-    }
+		if (book == null) {
+			throw new RequiredObjectIsNullException();
+		}
 
-    public void delete(Long id) {
-        logger.info("delete Book");
+		Book entity = getBook(book.getId());
+		entity.setAuthor(book.getAuthor());
+		entity.setLaunchDate(book.getLaunchDate());
+		entity.setPrice(book.getPrice());
+		entity.setTitle(book.getTitle());
 
-        var entity = getBook(id);
+		var dto = parseObject(repository.save(entity), BookDTO.class);
+		addHateoasLinks(dto);
+		return dto;
+	}
 
-        repository.delete(entity);
-    }
+	public void delete(Long id) {
+		logger.info("delete Book");
 
-    private void addHateoasLinks(BookDTO dto) {
-        dto.add(linkTo(methodOn(BookController.class).findById(dto.getId())).withSelfRel().withType("GET"));
-        dto.add(linkTo(methodOn(BookController.class).findAll(0,12,"asc")).withRel("findAll").withType("GET"));
-        dto.add(linkTo(methodOn(BookController.class).create(dto)).withRel("create").withType("POST"));
-        dto.add(linkTo(methodOn(BookController.class).update(dto)).withRel("update").withType("PUT"));
-        dto.add(linkTo(methodOn(BookController.class).delete(dto.getId())).withRel("delete").withType("DELETE"));
-    }
+		var entity = getBook(id);
+
+		repository.delete(entity);
+	}
+
+	private PagedModel<EntityModel<BookDTO>> buildPageModel(Map<String, String> params, Page<Book> books) {
+		Link findAllLink = linkTo(methodOn(BookController.class).findAll(params)).withSelfRel();
+
+		return PagedModelUtils.buildPageModel(
+				params,
+				books,
+				BookDTO.class,
+				assembler,
+				findAllLink,
+				this::addHateoasLinks);
+	}
+
+	private void addHateoasLinks(BookDTO dto) {
+		addHateoasLinks(dto, null);
+	}
+
+	private void addHateoasLinks(BookDTO dto, Map<String, String> params) {
+		dto.add(linkTo(methodOn(BookController.class).findById(dto.getId())).withSelfRel().withType("GET"));
+		dto.add(linkTo(methodOn(BookController.class).findAll(params)).withRel("findAll").withType("GET"));
+		dto.add(linkTo(methodOn(BookController.class).create(dto)).withRel("create").withType("POST"));
+		dto.add(linkTo(methodOn(BookController.class).update(dto)).withRel("update").withType("PUT"));
+		dto.add(linkTo(methodOn(BookController.class).delete(dto.getId())).withRel("delete").withType("DELETE"));
+	}
 }

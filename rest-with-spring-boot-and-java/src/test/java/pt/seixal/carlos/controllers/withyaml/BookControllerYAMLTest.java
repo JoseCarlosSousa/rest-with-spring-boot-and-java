@@ -1,8 +1,6 @@
 package pt.seixal.carlos.controllers.withyaml;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
@@ -130,7 +128,7 @@ class BookControllerYAMLTest extends AbstractIntegrationTest {
 
 		List<BookDTO> books = given(especification)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.queryParam("page", 1, "size", 10, "direction", "asc")
+				.queryParam("page", 1, "size", 10, "direction", "asc", "sort", "title")
 				.when()
 				.get()
 				.then()
@@ -141,18 +139,7 @@ class BookControllerYAMLTest extends AbstractIntegrationTest {
 				.as(PagedModelBook.class, objectMapper)
 				.getContent();
 
-		assertNotNull(books);
-
-		BookDTO dto = books.get(0);
-
-		assertNotNull(dto.getAuthor());
-		assertNotNull(dto.getTitle());
-		assertNotNull(dto.getPrice());
-
-		assertEquals(692, dto.getId());
-		assertEquals("Alis Dict", dto.getAuthor());
-		assertEquals(3.49, dto.getPrice());
-		assertEquals("42 Up", dto.getTitle());
+		assertBooks(books);
 
 	}
 

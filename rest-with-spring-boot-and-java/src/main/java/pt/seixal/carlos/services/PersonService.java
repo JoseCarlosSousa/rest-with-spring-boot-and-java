@@ -2,7 +2,7 @@ package pt.seixal.carlos.services;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-import static pt.seixal.carlos.mapper.ObjectMapper.parseObject;
+import static pt.seixal.carlos.mapper.DozertMapper.parseObject;
 
 import java.io.InputStream;
 import java.util.List;
@@ -14,10 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -38,6 +35,8 @@ import pt.seixal.carlos.file.importer.contract.FileImporter;
 import pt.seixal.carlos.file.importer.factory.FileImporterFactory;
 import pt.seixal.carlos.model.Person;
 import pt.seixal.carlos.repository.PersonRepository;
+import pt.seixal.carlos.util.PageableUtils;
+import pt.seixal.carlos.util.PagedModelUtils;
 
 @Service
 public class PersonService {
@@ -59,18 +58,21 @@ public class PersonService {
 	public PagedModel<EntityModel<PersonDTO>> findAll(Map<String, String> params) {
 		logger.info("Finding all people!");
 
-		return buildPageModel(params, repository.findAll(getPageable(params)));
+		Pageable pageable = PageableUtils.getPageable(params);
+		return buildPageModel(params, repository.findAll(pageable));
 	}
 
 	public PagedModel<EntityModel<PersonDTO>> findByName(String firstName, Map<String, String> params) {
 		logger.info("Finding People!");
-		return buildPageModel(params, repository.findPeopleByName(firstName, getPageable(params)));
+		Pageable pageable = PageableUtils.getPageable(params);
+		return buildPageModel(params, repository.findPeopleByName(firstName, pageable));
 	}
 
 	public Resource exportPage(Map<String, String> params, String acceptHeader) {
 		logger.info("Finding all people!");
 
-		var people = repository.findAll(getPageable(params))
+		Pageable pageable = PageableUtils.getPageable(params);
+		var people = repository.findAll(pageable)
 				.map(person -> parseObject(person, PersonDTO.class))
 				.getContent();
 
@@ -189,39 +191,16 @@ public class PersonService {
 		return dto;
 	}
 
-	private Pageable getPageable(Map<String, String> params) {
-		int page = params.containsKey("page") ? Integer.parseInt(params.get("page")) : 0;
-		int size = params.containsKey("size") ? Integer.parseInt(params.get("size")) : 12;
-
-		Sort sort = Sort.unsorted();
-
-		if (params.containsKey("direction") && params.containsKey("sort")) {
-
-			String sortColumn = params.get("sort");
-
-			switch (params.get("direction").toLowerCase()) {
-			case "desc":
-				sort = Sort.by(Direction.DESC, sortColumn);
-			case "asc":
-				sort = Sort.by(Direction.ASC, sortColumn);
-			}
-		}
-
-		Pageable pageable = PageRequest.of(page, size, sort);
-		return pageable;
-	}
-
 	private PagedModel<EntityModel<PersonDTO>> buildPageModel(Map<String, String> params, Page<Person> people) {
-		var peopleWithLinks = people.map(person -> {
-			var dto = parseObject(person, PersonDTO.class);
-			addHateoasLinks(dto, params);
-			return dto;
-		});
+		Link findAllLink = linkTo(methodOn(PersonController.class).findAll(params)).withSelfRel();
 
-		Link findAllLink = linkTo(
-				methodOn(PersonController.class).findAll(params)).withSelfRel();
-
-		return assembler.toModel(peopleWithLinks, findAllLink);
+		return PagedModelUtils.buildPageModel(
+				params,
+				people,
+				PersonDTO.class,
+				assembler,
+				findAllLink,
+				this::addHateoasLinks);
 	}
 
 	private void addHateoasLinks(PersonDTO dto) {

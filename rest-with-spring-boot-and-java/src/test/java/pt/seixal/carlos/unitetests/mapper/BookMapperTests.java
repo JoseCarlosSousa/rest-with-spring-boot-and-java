@@ -12,8 +12,8 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static pt.seixal.carlos.mapper.ObjectMapper.parseListObjects;
-import static pt.seixal.carlos.mapper.ObjectMapper.parseObject;
+import static pt.seixal.carlos.mapper.DozertMapper.parseListObjects;
+import static pt.seixal.carlos.mapper.DozertMapper.parseObject;
 
 public class BookMapperTests {
     MockBook inputObject;

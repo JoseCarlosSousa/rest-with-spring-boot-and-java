@@ -141,6 +141,17 @@ public abstract class AbstractIntegrationTest {
 		assertTrue(dto.getEnabled());
 	}
 
+	protected static void assertBooks(List<BookDTO> list) {
+		assertNotNull(list);
+		var dto = list.get(0);
+
+		assertEquals(13, dto.getId());
+		assertEquals("Richard Hunter e George Westerman", dto.getAuthor());
+		assertEquals(95.0, dto.getPrice());
+		assertEquals("O verdadeiro valor de TI", dto.getTitle());
+		assertNotNull(dto.getLaunchDate());
+	}
+
 	protected static void mockBook() {
 		book.setAuthor("Author Test");
 		book.setLaunchDate(generateLaunchDate());
