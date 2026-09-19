@@ -18,7 +18,7 @@ email:
 
 spring:
   application:
-    name: rest-with-spring-boot-and-java
+    name: curse-java
   
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/spring_boot_starter_data_jpa?useTimezone=true&serverTimezone=UTC}

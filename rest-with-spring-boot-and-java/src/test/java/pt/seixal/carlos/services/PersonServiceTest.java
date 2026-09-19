@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,10 +25,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -93,9 +91,8 @@ class PersonServiceTest {
 				any(Page.class),
 				any(Link.class))).thenReturn(pagedModel);
 
-		Pageable pageable = PageRequest.of(1, 10, Sort.by(Direction.ASC, "name"));
-
-		var people = service.findAll(pageable).getContent()
+		var parms = Map.of("page", "1", "size", "10", "direction", "asc", "sort", "firstName");
+		var people = service.findAll(parms).getContent()
 				.stream().map(EntityModel::getContent).toList();
 
 		assertNotNull(people);

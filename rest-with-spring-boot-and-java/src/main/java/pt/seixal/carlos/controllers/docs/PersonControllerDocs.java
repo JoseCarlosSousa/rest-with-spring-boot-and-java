@@ -1,6 +1,7 @@
 package pt.seixal.carlos.controllers.docs;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.core.io.Resource;
 import org.springframework.hateoas.EntityModel;
@@ -26,243 +27,160 @@ import jakarta.servlet.http.HttpServletRequest;
 import pt.seixal.carlos.data.dto.v1.PersonDTO;
 import pt.seixal.carlos.file.exporter.MediaTypes;
 
-
 public interface PersonControllerDocs {
 
-    @GetMapping(
-            produces = {
-                    MediaType.APPLICATION_JSON_VALUE,
-                    MediaType.APPLICATION_XML_VALUE,
-                    MediaType.APPLICATION_YAML_VALUE})
-    @Operation(summary = "Find all people",
-            description = "Find all people in the database",
-            tags = {"People"},
-            responses = {
-                    @ApiResponse(
-                            description = "Success",
-                            responseCode = "200",
-                            content = {@Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    array = @ArraySchema(schema = @Schema(implementation = PersonDTO.class))
-                            )}),
-                    @ApiResponse(description = "No content", responseCode = "204", content = @Content),
-                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-                    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
-                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
-            })
-    ResponseEntity<PagedModel<EntityModel<PersonDTO>>> findAll(
-        	@RequestParam(value = "page", defaultValue = "0") int page,
-        	@RequestParam(value = "size", defaultValue = "12") int size,
-        	@RequestParam(value = "direction", defaultValue = "asc") String direction
-    );
+	@GetMapping(produces = {
+			MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE,
+			MediaType.APPLICATION_YAML_VALUE })
+	@Operation(summary = "Find all people", description = "Find all people in the database", tags = {
+			"People" }, responses = {
+					@ApiResponse(description = "Success", responseCode = "200", content = {
+							@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = PersonDTO.class))) }),
+					@ApiResponse(description = "No content", responseCode = "204", content = @Content),
+					@ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+					@ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+					@ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+			})
+	ResponseEntity<PagedModel<EntityModel<PersonDTO>>> findAll(@RequestParam Map<String, String> allParams);
 
-    @GetMapping(value = "/exportPage",
-            produces = {
-                    MediaTypes.CSV,
-                    MediaTypes.XLSX,
-                    MediaTypes.PDF
-})
-    @Operation(summary = "Export people",
-            description = "Export a Page od People in XLSX and CSV format",
-            tags = {"People"},
-            responses = {
-                    @ApiResponse(
-                            description = "Success",
-                            responseCode = "200",
-                            content = {
-                            		@Content(mediaType = MediaTypes.CSV),
-                            		@Content(mediaType = MediaTypes.XLSX),
-                            		@Content(mediaType = MediaTypes.PDF)
-                            		}),
-                    @ApiResponse(description = "No content", responseCode = "204", content = @Content),
-                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-                    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
-                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
-            })
-    ResponseEntity<Resource> exportPage(
-        	@RequestParam(value = "page", defaultValue = "0") int page,
-        	@RequestParam(value = "size", defaultValue = "12") int size,
-        	@RequestParam(value = "direction", defaultValue = "asc") String direction,
-        	HttpServletRequest request
-    );
-    
-    @GetMapping(value = "/export/{id}",
-            produces = {
-                    MediaTypes.CSV,
-                    MediaTypes.XLSX,
-                    MediaTypes.PDF
-})
-    @Operation(summary = "Export person",
-            description = "Export a Page od person in XLSX, CSV or PDF format",
-            tags = {"People"},
-            responses = {
-                    @ApiResponse(
-                            description = "Success",
-                            responseCode = "200",
-                            content = {
-                            		@Content(mediaType = MediaTypes.CSV),
-                            		@Content(mediaType = MediaTypes.XLSX),
-                            		@Content(mediaType = MediaTypes.PDF)
-                            		}),
-                    @ApiResponse(description = "No content", responseCode = "204", content = @Content),
-                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-                    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
-                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
-            })
-    ResponseEntity<Resource> export(@PathVariable("id") Long id, HttpServletRequest request);
-    
+	@GetMapping(value = "/exportPage", produces = {
+			MediaTypes.CSV,
+			MediaTypes.XLSX,
+			MediaTypes.PDF
+	})
+	@Operation(summary = "Export people", description = "Export a Page od People in XLSX and CSV format", tags = {
+			"People" }, responses = {
+					@ApiResponse(description = "Success", responseCode = "200", content = {
+							@Content(mediaType = MediaTypes.CSV),
+							@Content(mediaType = MediaTypes.XLSX),
+							@Content(mediaType = MediaTypes.PDF)
+					}),
+					@ApiResponse(description = "No content", responseCode = "204", content = @Content),
+					@ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+					@ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+					@ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+			})
+	ResponseEntity<Resource> exportPage(
+			@RequestParam Map<String, String> allParams,
+			HttpServletRequest request);
 
-    @GetMapping(value = "/findPeopleByName/{firstName}",
-            produces = {
-                    MediaType.APPLICATION_JSON_VALUE,
-                    MediaType.APPLICATION_XML_VALUE,
-                    MediaType.APPLICATION_YAML_VALUE})
-    @Operation(summary = "Find people",
-            description = "Find people in the database",
-            tags = {"People"},
-            responses = {
-                    @ApiResponse(
-                            description = "Success",
-                            responseCode = "200",
-                            content = {@Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    array = @ArraySchema(schema = @Schema(implementation = PersonDTO.class))
-                            )}),
-                    @ApiResponse(description = "No content", responseCode = "204", content = @Content),
-                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-                    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
-                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
-            })
-    ResponseEntity<PagedModel<EntityModel<PersonDTO>>> findByName(
-    		@PathVariable(value = "firstName") String firstName,
-        	@RequestParam(value = "page", defaultValue = "0") int page,
-        	@RequestParam(value = "size", defaultValue = "12") int size,
-        	@RequestParam(value = "direction", defaultValue = "asc") String direction
-    );
+	@GetMapping(value = "/export/{id}", produces = {
+			MediaTypes.CSV,
+			MediaTypes.XLSX,
+			MediaTypes.PDF
+	})
+	@Operation(summary = "Export person", description = "Export a Page od person in XLSX, CSV or PDF format", tags = {
+			"People" }, responses = {
+					@ApiResponse(description = "Success", responseCode = "200", content = {
+							@Content(mediaType = MediaTypes.CSV),
+							@Content(mediaType = MediaTypes.XLSX),
+							@Content(mediaType = MediaTypes.PDF)
+					}),
+					@ApiResponse(description = "No content", responseCode = "204", content = @Content),
+					@ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+					@ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+					@ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+			})
+	ResponseEntity<Resource> export(@PathVariable("id") Long id, HttpServletRequest request);
 
-    @GetMapping(value = "/{id}",
-            produces = {
-                    MediaType.APPLICATION_JSON_VALUE,
-                    MediaType.APPLICATION_XML_VALUE,
-                    MediaType.APPLICATION_YAML_VALUE})
-    @Operation(summary = "Find a person",
-            description = "Find a person by ID",
-            tags = {"People"},
-            responses = {
-                    @ApiResponse(
-                            description = "Success",
-                            responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = PersonDTO.class))),
-                    @ApiResponse(description = "No content", responseCode = "204", content = @Content),
-                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-                    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
-                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
-            })
-    PersonDTO findById(@PathVariable("id") Long id);
+	@GetMapping(value = "/findPeopleByName/{firstName}", produces = {
+			MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE,
+			MediaType.APPLICATION_YAML_VALUE })
+	@Operation(summary = "Find people", description = "Find people in the database", tags = { "People" }, responses = {
+			@ApiResponse(description = "Success", responseCode = "200", content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = PersonDTO.class))) }),
+			@ApiResponse(description = "No content", responseCode = "204", content = @Content),
+			@ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+			@ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+			@ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+	})
+	ResponseEntity<PagedModel<EntityModel<PersonDTO>>> findByName(
+			@PathVariable(value = "firstName") String firstName,
+			@RequestParam Map<String, String> allParams);
 
-    @PostMapping(
-            consumes = {
-                    MediaType.APPLICATION_JSON_VALUE,
-                    MediaType.APPLICATION_XML_VALUE,
-                    MediaType.APPLICATION_YAML_VALUE},
-            produces = {
-                    MediaType.APPLICATION_JSON_VALUE,
-                    MediaType.APPLICATION_XML_VALUE,
-                    MediaType.APPLICATION_YAML_VALUE})
-    @Operation(summary = "Create a person",
-            description = "Create a person in the database",
-            tags = {"People"},
-            responses = {
-                    @ApiResponse(
-                            description = "Success",
-                            responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = PersonDTO.class))),
-                    @ApiResponse(description = "No content", responseCode = "204", content = @Content),
-                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-                    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
-                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
-            })
-    PersonDTO create(@RequestBody PersonDTO person);
+	@GetMapping(value = "/{id}", produces = {
+			MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE,
+			MediaType.APPLICATION_YAML_VALUE })
+	@Operation(summary = "Find a person", description = "Find a person by ID", tags = { "People" }, responses = {
+			@ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = PersonDTO.class))),
+			@ApiResponse(description = "No content", responseCode = "204", content = @Content),
+			@ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+			@ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+			@ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+	})
+	PersonDTO findById(@PathVariable("id") Long id);
 
+	@PostMapping(consumes = {
+			MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE,
+			MediaType.APPLICATION_YAML_VALUE }, produces = {
+					MediaType.APPLICATION_JSON_VALUE,
+					MediaType.APPLICATION_XML_VALUE,
+					MediaType.APPLICATION_YAML_VALUE })
+	@Operation(summary = "Create a person", description = "Create a person in the database", tags = {
+			"People" }, responses = {
+					@ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = PersonDTO.class))),
+					@ApiResponse(description = "No content", responseCode = "204", content = @Content),
+					@ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+					@ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+					@ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+			})
+	PersonDTO create(@RequestBody PersonDTO person);
 
-    @PostMapping(value = "/massCreation",
-            produces = {
-                    MediaType.APPLICATION_JSON_VALUE,
-                    MediaType.APPLICATION_XML_VALUE,
-                    MediaType.APPLICATION_YAML_VALUE})
-    @Operation(summary = "Massice people creation",
-            description = "Massice people creation with upload of XLSX or CSV",
-            tags = {"People"},
-            responses = {
-                    @ApiResponse(
-                            description = "Success",
-                            responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = PersonDTO.class))
-                            ),
-                    @ApiResponse(description = "No content", responseCode = "204", content = @Content),
-                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-                    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
-                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
-            })
-    List<PersonDTO> massCreation(@RequestParam("file") MultipartFile file);
-    
-    @PutMapping(
-            consumes = {
-                    MediaType.APPLICATION_JSON_VALUE,
-                    MediaType.APPLICATION_XML_VALUE,
-                    MediaType.APPLICATION_YAML_VALUE},
-            produces = {
-                    MediaType.APPLICATION_JSON_VALUE,
-                    MediaType.APPLICATION_XML_VALUE,
-                    MediaType.APPLICATION_YAML_VALUE})
-    @Operation(summary = "Update Person",
-            description = "Update a person in the database",
-            tags = {"People"},
-            responses = {
-                    @ApiResponse(
-                            description = "Success",
-                            responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = PersonDTO.class))),
-                    @ApiResponse(description = "No content", responseCode = "204", content = @Content),
-                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-                    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
-                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
-            })
-    PersonDTO update(@RequestBody PersonDTO person);
+	@PostMapping(value = "/massCreation", produces = {
+			MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE,
+			MediaType.APPLICATION_YAML_VALUE })
+	@Operation(summary = "Massice people creation", description = "Massice people creation with upload of XLSX or CSV", tags = {
+			"People" }, responses = {
+					@ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = PersonDTO.class))),
+					@ApiResponse(description = "No content", responseCode = "204", content = @Content),
+					@ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+					@ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+					@ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+			})
+	List<PersonDTO> massCreation(@RequestParam("file") MultipartFile file);
 
-    @DeleteMapping(value = "/{id}")
-    @Operation(summary = "Delete a person",
-            description = "Delete a person by ID",
-            tags = {"People"},
-            responses = {
-                    @ApiResponse(
-                            description = "Success",
-                            responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = PersonDTO.class))),
-                    @ApiResponse(description = "No content", responseCode = "204", content = @Content),
-                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-                    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
-                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
-            })
-    ResponseEntity<?> delete(@PathVariable("id") Long id);
-    
-    @PatchMapping(value = "/{id}",
-            produces = {
-                    MediaType.APPLICATION_JSON_VALUE,
-                    MediaType.APPLICATION_XML_VALUE,
-                    MediaType.APPLICATION_YAML_VALUE})
-    @Operation(summary = "Disable a person",
-            description = "Disable a person by ID",
-            tags = {"People"},
-            responses = {
-                    @ApiResponse(
-                            description = "Success",
-                            responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = PersonDTO.class))),
-                    @ApiResponse(description = "No content", responseCode = "204", content = @Content),
-                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-                    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
-                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
-            })
-    PersonDTO disablePerson(@PathVariable("id") Long id);
+	@PutMapping(consumes = {
+			MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE,
+			MediaType.APPLICATION_YAML_VALUE }, produces = {
+					MediaType.APPLICATION_JSON_VALUE,
+					MediaType.APPLICATION_XML_VALUE,
+					MediaType.APPLICATION_YAML_VALUE })
+	@Operation(summary = "Update Person", description = "Update a person in the database", tags = {
+			"People" }, responses = {
+					@ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = PersonDTO.class))),
+					@ApiResponse(description = "No content", responseCode = "204", content = @Content),
+					@ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+					@ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+					@ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+			})
+	PersonDTO update(@RequestBody PersonDTO person);
+
+	@DeleteMapping(value = "/{id}")
+	@Operation(summary = "Delete a person", description = "Delete a person by ID", tags = { "People" }, responses = {
+			@ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = PersonDTO.class))),
+			@ApiResponse(description = "No content", responseCode = "204", content = @Content),
+			@ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+			@ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+			@ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+	})
+	ResponseEntity<?> delete(@PathVariable("id") Long id);
+
+	@PatchMapping(value = "/{id}", produces = {
+			MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE,
+			MediaType.APPLICATION_YAML_VALUE })
+	@Operation(summary = "Disable a person", description = "Disable a person by ID", tags = { "People" }, responses = {
+			@ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = PersonDTO.class))),
+			@ApiResponse(description = "No content", responseCode = "204", content = @Content),
+			@ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+			@ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+			@ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+	})
+	PersonDTO disablePerson(@PathVariable("id") Long id);
 }
