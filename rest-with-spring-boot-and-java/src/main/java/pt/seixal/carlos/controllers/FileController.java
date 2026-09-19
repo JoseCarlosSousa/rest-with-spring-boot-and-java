@@ -1,5 +1,9 @@
 package pt.seixal.carlos.controllers;
 
+import static java.nio.file.Files.probeContentType;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,7 +46,6 @@ public class FileController implements FileControllerDocs {
 
 	@Override
 	public List<UploadFileResponseDTO> uploadMultipleFiles(MultipartFile[] files) {
-
 		return Arrays.asList(files).stream().map(file -> uploadFile(file)).toList();
 	}
 
@@ -51,11 +54,13 @@ public class FileController implements FileControllerDocs {
 		Resource resource = service.loadFileAsResource(fileName);
 		String contentType = null;
 		try {
-			contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+			Path path = Paths.get(resource.getURI());
+			contentType = probeContentType(path);
 		} catch (Exception e) {
-			logger.info("Could not determine file type.");
+			logger.info("Could not determine file type via Java NIO.");
 		}
-		if (contentType == null) {
+
+		if (contentType == null || contentType.isBlank()) {
 			contentType = "application/octet-stream";
 		}
 		return ResponseEntity.ok()
