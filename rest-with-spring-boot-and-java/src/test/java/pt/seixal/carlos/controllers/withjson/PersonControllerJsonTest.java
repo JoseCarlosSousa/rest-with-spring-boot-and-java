@@ -1,10 +1,6 @@
 package pt.seixal.carlos.controllers.withjson;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -137,7 +133,7 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.queryParam("page", 1, "size", 10, "direction", "asc")
+				.queryParam("page", 0, "size", 5)
 				.when()
 				.get()
 				.then()
@@ -147,21 +143,10 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 				.body()
 				.asString();
 
-		// List<PersonDTO> people = objectMapper.readValue(content, new
-		// TypeReference<List<PersonDTO>>() {});
 		WrapperPersonDTO wrapper = objectMapper.readValue(content, WrapperPersonDTO.class);
 		List<PersonDTO> people = wrapper.getEmbedded().getPeople();
 
-		assertNotNull(people);
-
-		PersonDTO person1 = people.get(0);
-
-		// assertEquals(127, person1.getId());
-		assertEquals("Abey", person1.getFirstName());
-		assertEquals("Lebreton", person1.getLastName());
-		assertEquals("Apt 1341", person1.getAddress());
-		assertEquals("Male", person1.getGender());
-		assertTrue(person1.getEnabled());
+		assertPerson(people);
 
 	}
 
@@ -169,11 +154,10 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	@Order(7)
 	void findByNameTest() throws JsonMappingException, JsonProcessingException {
 
-		// api/person/v1/findPeopleByName/and?page=0&size=5&direction=asc
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.pathParam("firstName", "and")
-				.queryParam("page", 0, "size", 10, "direction", "asc")
+				.pathParam("firstName", "carlos")
+				.queryParam("page", 0, "size", 5)
 				.when()
 				.get("findPeopleByName/{firstName}")
 				.then()
@@ -183,20 +167,9 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 				.body()
 				.asString();
 
-		// List<PersonDTO> people = objectMapper.readValue(content, new
-		// TypeReference<List<PersonDTO>>() {});
 		WrapperPersonDTO wrapper = objectMapper.readValue(content, WrapperPersonDTO.class);
 		List<PersonDTO> people = wrapper.getEmbedded().getPeople();
-
-		assertNotNull(people);
-
-		PersonDTO person1 = people.get(0);
-
-		assertEquals("Aland", person1.getFirstName());
-		assertEquals("Boyn", person1.getLastName());
-		assertEquals("Apt 653", person1.getAddress());
-		assertEquals("Male", person1.getGender());
-		assertFalse(person1.getEnabled());
+		assertPerson(people);
 
 	}
 }

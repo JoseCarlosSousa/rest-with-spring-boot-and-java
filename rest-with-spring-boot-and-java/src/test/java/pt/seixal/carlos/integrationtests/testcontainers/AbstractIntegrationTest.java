@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -122,6 +123,22 @@ public abstract class AbstractIntegrationTest {
 		}
 		assertNotNull(person.getPhotoUrl());
 		assertNotNull(person.getProfileUrl());
+	}
+
+	protected static void assertPerson(List<PersonDTO> list) {
+
+		assertNotNull(list);
+		var dto = list.get(0);
+
+		assertEquals("Carlos Campos", dto.getFirstName());
+		assertEquals("Sousa", dto.getLastName());
+		assertEquals("Rua das Pretas", dto.getAddress());
+		assertEquals("Male", dto.getGender());
+		assertEquals(
+				"https://raw.githubusercontent.com/leandrocgsi/rest-with-spring-boot-and-java-erudio/refs/heads/main/photos/01_senna.jpg",
+				dto.getPhotoUrl());
+		assertEquals("https://en.wikipedia.org/wiki/Ayrton_Senna", dto.getProfileUrl());
+		assertTrue(dto.getEnabled());
 	}
 
 	protected static void mockBook() {

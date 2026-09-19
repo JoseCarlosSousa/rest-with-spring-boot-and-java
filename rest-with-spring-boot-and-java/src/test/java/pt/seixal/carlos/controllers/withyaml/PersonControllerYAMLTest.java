@@ -1,12 +1,6 @@
 package pt.seixal.carlos.controllers.withyaml;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -153,9 +147,9 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 	@Order(6)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
 
-		var response = given(especification)
+		var people = given(especification)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.queryParam("page", 1, "size", 10, "direction", "asc")
+				.queryParam("page", 0, "size", 5)
 				.when()
 				.get()
 				.then()
@@ -163,29 +157,20 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.extract()
 				.body()
-				.as(PagedModelPerson.class, objectMapper);
+				.as(PagedModelPerson.class, objectMapper)
+				.getContent();
 
-		// List<PersonDTO> people = Arrays.asList(response);
-		List<PersonDTO> people = response.getContent();
-		assertNotNull(people);
-
-		PersonDTO person1 = people.get(0);
-		assertEquals("Abey", person1.getFirstName());
-		assertEquals("Lebreton", person1.getLastName());
-		assertEquals("Apt 1341", person1.getAddress());
-		assertEquals("Male", person1.getGender());
-		assertTrue(person1.getEnabled());
-
+		assertPerson(people);
 	}
 
 	@Test
-	@Order(6)
+	@Order(7)
 	void findByNameTest() throws JsonMappingException, JsonProcessingException {
 
-		var response = given(especification)
+		var people = given(especification)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.pathParam("firstName", "and")
-				.queryParam("page", 0, "size", 10, "direction", "asc")
+				.pathParam("firstName", "carlos")
+				.queryParam("page", 0, "size", 5)
 				.when()
 				.get("findPeopleByName/{firstName}")
 				.then()
@@ -193,18 +178,10 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.extract()
 				.body()
-				.as(PagedModelPerson.class, objectMapper);
+				.as(PagedModelPerson.class, objectMapper)
+				.getContent();
 
-		// List<PersonDTO> people = Arrays.asList(response);
-		List<PersonDTO> people = response.getContent();
-		assertNotNull(people);
-
-		PersonDTO person1 = people.get(0);
-		assertEquals("Aland", person1.getFirstName());
-		assertEquals("Boyn", person1.getLastName());
-		assertEquals("Apt 653", person1.getAddress());
-		assertEquals("Male", person1.getGender());
-		assertFalse(person1.getEnabled());
-
+		assertPerson(people);
 	}
+
 }

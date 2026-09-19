@@ -128,7 +128,7 @@ class BookControllerYAMLTest extends AbstractIntegrationTest {
 	@Order(5)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
 
-		var response = given(especification)
+		List<BookDTO> books = given(especification)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
 				.queryParam("page", 1, "size", 10, "direction", "asc")
 				.when()
@@ -138,9 +138,9 @@ class BookControllerYAMLTest extends AbstractIntegrationTest {
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.extract()
 				.body()
-				.as(PagedModelBook.class, objectMapper);
+				.as(PagedModelBook.class, objectMapper)
+				.getContent();
 
-		List<BookDTO> books = response.getContent();
 		assertNotNull(books);
 
 		BookDTO dto = books.get(0);

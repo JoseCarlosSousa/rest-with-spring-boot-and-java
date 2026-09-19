@@ -1,11 +1,6 @@
 package pt.seixal.carlos.controllers.withxml;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -146,7 +141,7 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 
 		var content = given(especification)
 				.accept(MediaType.APPLICATION_XML_VALUE)
-				.queryParam("page", 1, "size", 10, "direction", "asc")
+				.queryParam("page", 0, "size", 5)
 				.when()
 				.get()
 				.then()
@@ -156,17 +151,8 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 				.body()
 				.asString();
 
-		// List<PersonDTO> people = objectMapper.readValue(content, new
-		// TypeReference<List<PersonDTO>>() {});
 		PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class);
-		List<PersonDTO> people = wrapper.getContent();
-
-		PersonDTO person1 = people.get(0);
-		assertEquals("Abey", person1.getFirstName());
-		assertEquals("Lebreton", person1.getLastName());
-		assertEquals("Apt 1341", person1.getAddress());
-		assertEquals("Male", person1.getGender());
-		assertTrue(person1.getEnabled());
+		assertPerson(wrapper.getContent());
 
 	}
 
@@ -176,8 +162,8 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 
 		var content = given(especification)
 				.accept(MediaType.APPLICATION_XML_VALUE)
-				.pathParam("firstName", "and")
-				.queryParam("page", 0, "size", 10, "direction", "asc")
+				.pathParam("firstName", "carlos")
+				.queryParam("page", 0, "size", 5)
 				.when()
 				.get("findPeopleByName/{firstName}")
 				.then()
@@ -187,17 +173,8 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 				.body()
 				.asString();
 
-		// List<PersonDTO> people = objectMapper.readValue(content, new
-		// TypeReference<List<PersonDTO>>() {});
 		PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class);
-		List<PersonDTO> people = wrapper.getContent();
-
-		PersonDTO person1 = people.get(0);
-		assertEquals("Aland", person1.getFirstName());
-		assertEquals("Boyn", person1.getLastName());
-		assertEquals("Apt 653", person1.getAddress());
-		assertEquals("Male", person1.getGender());
-		assertFalse(person1.getEnabled());
+		assertPerson(wrapper.getContent());
 
 	}
 }

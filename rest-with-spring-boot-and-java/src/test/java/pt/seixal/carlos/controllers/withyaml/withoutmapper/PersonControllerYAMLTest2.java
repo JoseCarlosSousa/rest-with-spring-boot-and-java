@@ -1,12 +1,6 @@
 package pt.seixal.carlos.controllers.withyaml.withoutmapper;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -156,7 +150,7 @@ class PersonControllerYAMLTest2 extends AbstractIntegrationTest {
 
 		var content = given(especification)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.queryParam("page", 1, "size", 10, "direction", "asc")
+				.queryParam("page", 0, "size", 5)
 				.when()
 				.get()
 				.then()
@@ -167,19 +161,7 @@ class PersonControllerYAMLTest2 extends AbstractIntegrationTest {
 				.asString();
 
 		PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class);
-		List<PersonDTO> people = wrapper.getContent();
-
-		assertNotNull(people);
-
-		for (PersonDTO person : people) {
-			assertNotNull(person.getId());
-			assertTrue(person.getId() > 0);
-
-			assertNotNull(person.getFirstName());
-			assertNotNull(person.getLastName());
-			assertNotNull(person.getAddress());
-			assertNotNull(person.getGender());
-		}
+		assertPerson(wrapper.getContent());
 
 	}
 
@@ -189,8 +171,8 @@ class PersonControllerYAMLTest2 extends AbstractIntegrationTest {
 
 		var content = given(especification)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.pathParam("firstName", "and")
-				.queryParam("page", 0, "size", 10, "direction", "asc")
+				.pathParam("firstName", "carlos")
+				.queryParam("page", 0, "size", 5)
 				.when()
 				.get("findPeopleByName/{firstName}")
 				.then()
@@ -201,14 +183,7 @@ class PersonControllerYAMLTest2 extends AbstractIntegrationTest {
 				.asString();
 
 		PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class);
-		List<PersonDTO> people = wrapper.getContent();
-
-		PersonDTO person1 = people.get(0);
-		assertEquals("Aland", person1.getFirstName());
-		assertEquals("Boyn", person1.getLastName());
-		assertEquals("Apt 653", person1.getAddress());
-		assertEquals("Male", person1.getGender());
-		assertFalse(person1.getEnabled());
+		assertPerson(wrapper.getContent());
 
 	}
 
