@@ -29,16 +29,18 @@ import pt.seixal.carlos.model.Person;
 class PersonRepositoryTest extends AbstractIntegrationTest {
 
 	@LocalServerPort
-	private static int port;
+	private int port;
 
 	@Autowired
 	PersonRepository repository;
+
 	private static Person person;
 
 	@BeforeAll
-	static void setUp() {
-		person = new Person();
-
+	void setUp() {
+		if (person == null) {
+			person = new Person();
+		}
 		RestAssured.port = port;
 		RestAssured.basePath = "/api/person";
 	}
