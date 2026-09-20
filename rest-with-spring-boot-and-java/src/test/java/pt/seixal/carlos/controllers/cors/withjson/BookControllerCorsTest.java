@@ -119,13 +119,6 @@ public class BookControllerCorsTest extends AbstractIntegrationTest {
 		book.setTitle("Title Test");
 	}
 
-	private Date generateLaunchDate() {
-		String strDate = "2026-08-17";
-		return Date.from(LocalDate.parse(strDate)
-				.atStartOfDay(ZoneId.systemDefault())
-				.toInstant());
-	}
-
 	private void checkBook() {
 		assertNotNull(book);
 		assertNotNull(book.getId());
@@ -133,5 +126,12 @@ public class BookControllerCorsTest extends AbstractIntegrationTest {
 		assertNotNull(book.getLaunchDate());
 		assertNotNull(book.getPrice());
 		assertNotNull(book.getTitle());
+	}
+
+	private Date generateLaunchDate() {
+		String strDate = "2026-08-17";
+		return Date.from(LocalDate.parse(strDate)
+				.atStartOfDay(ZoneId.systemDefault())
+				.toInstant());
 	}
 }

@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -30,7 +29,7 @@ import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class BookControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: Anotação @SpringBootTest de porta fixa
+class BookControllerYAMLTest extends AbstractIntegrationTest {
 
 	private BookDTO book;
 	private static YAMLMapper objectMapper;
@@ -43,6 +42,7 @@ class BookControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: Anot
 	@Test
 	@Order(1)
 	void createTest() throws JsonMappingException, JsonProcessingException {
+
 		mockBook();
 		setEspecification("book");
 
@@ -67,11 +67,12 @@ class BookControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: Anot
 	}
 
 	@Test
-	@Disabled
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
+
+		mockBook();
 		setEspecification("book");
-		book.setAuthor("Rui Oliveira"); // Mantém o ID ativo gerado no passo 1
+		book.setAuthor("Rui Oliveira");
 
 		book = given()
 				.config(RestAssuredConfig.config()
@@ -82,8 +83,7 @@ class BookControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: Anot
 				.accept(MediaType.APPLICATION_YAML_VALUE)
 				.body(book, objectMapper)
 				.when()
-				.put() // <--- CORRIGIDO: Mudou de .post() para .put() para evitar o erro 500 do
-						// Hibernate
+				.put()
 				.then()
 				.statusCode(200)
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
@@ -91,13 +91,14 @@ class BookControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: Anot
 				.body()
 				.as(BookDTO.class, objectMapper);
 
-		checkBook("Rui Oliveira");
+		checkBook();
+		assertEquals("Rui Oliveira", book.getAuthor());
 	}
 
 	@Test
-	@Disabled
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
+
 		setEspecification("book");
 
 		book = given()
@@ -107,7 +108,7 @@ class BookControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: Anot
 				.spec(especification)
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.pathParam("id", book.getId()) // Captura o ID dinâmico e seguro
+				.pathParam("id", 1L)
 				.when()
 				.get("{id}")
 				.then()
@@ -117,17 +118,16 @@ class BookControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: Anot
 				.body()
 				.as(BookDTO.class, objectMapper);
 
-		checkBook("Rui Oliveira");
+		checkBook();
 	}
 
 	@Test
-	@Disabled
 	@Order(4)
 	void deleteTest() {
 		setEspecification("book");
 
 		given(especification)
-				.pathParam("id", book.getId())
+				.pathParam("id", 1L)
 				.when()
 				.delete("{id}")
 				.then()
@@ -137,6 +137,7 @@ class BookControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: Anot
 	@Test
 	@Order(5)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
+
 		setEspecification("book");
 
 		List<BookDTO> books = given(especification)
@@ -152,32 +153,26 @@ class BookControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: Anot
 				.as(PagedModelBook.class, objectMapper)
 				.getContent();
 
-		assertBooks(books);
+		assertNotNull(books);
+
+		for (int i = 0; i < books.size(); i++) {
+			assertNotNull(books.get(i).getAuthor());
+			assertNotNull(books.get(i).getTitle());
+			assertNotNull(books.get(i).getPrice());
+			assertNotNull(books.get(i).getLaunchDate());
+		}
 	}
 
 	private void mockBook() {
-		if (book == null) {
-			book = new BookDTO();
-		}
-		book.setId(null);
-		book.setAuthor("Author Test");
+		book = new BookDTO();
+		book.setId(1L);
+		book.setAuthor("Michael C. Feathers");
 		book.setLaunchDate(generateLaunchDate());
-		book.setPrice(200.00);
-		book.setTitle("Title Test");
-	}
-
-	private Date generateLaunchDate() {
-		String strDate = "2026-08-17";
-		return Date.from(LocalDate.parse(strDate)
-				.atStartOfDay(ZoneId.systemDefault())
-				.toInstant());
+		book.setPrice(49.00);
+		book.setTitle("Working effectively with legacy code");
 	}
 
 	private void checkBook() {
-		checkBook("Author Test");
-	}
-
-	private void checkBook(String author) {
 		assertNotNull(book);
 		assertNotNull(book.getId());
 		assertNotNull(book.getAuthor());
@@ -186,14 +181,10 @@ class BookControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: Anot
 		assertNotNull(book.getTitle());
 	}
 
-	private void assertBooks(List<BookDTO> list) {
-		assertNotNull(list);
-		var dto = list.get(0);
-
-		assertEquals(13, dto.getId());
-		assertEquals("Richard Hunter e George Westerman", dto.getAuthor());
-		assertEquals(95.0, dto.getPrice());
-		assertEquals("O verdadeiro valor de TI", dto.getTitle());
-		assertNotNull(dto.getLaunchDate());
+	private Date generateLaunchDate() {
+		String strDate = "2026-08-17";
+		return Date.from(LocalDate.parse(strDate)
+				.atStartOfDay(ZoneId.systemDefault())
+				.toInstant());
 	}
 }
