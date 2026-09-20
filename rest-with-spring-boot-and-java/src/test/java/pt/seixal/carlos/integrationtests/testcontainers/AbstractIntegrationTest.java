@@ -52,14 +52,10 @@ public abstract class AbstractIntegrationTest {
 
 	@BeforeEach
 	void setUpDefinition() {
-		// Proteção: Só cria instâncias novas se os testes anteriores ainda não as
-		// tiverem populado
-		if (person == null || person.getId() == null) {
-			person = new PersonDTO();
-		}
-		if (book == null || book.getId() == null) {
-			book = new BookDTO();
-		}
+		// Correção estrutural: Instancia sempre objetos limpos a cada método.
+		// Isto impede que o ID gerado no JSON ou YAML contamine as classes seguintes.
+		person = new PersonDTO();
+		book = new BookDTO();
 
 		if (sharedAccessToken == null || sharedAccessToken.isBlank()) {
 			var credentials = new AccountCredentialsDTO("carlos", "admin123");
@@ -106,6 +102,7 @@ public abstract class AbstractIntegrationTest {
 		if (person == null) {
 			person = new PersonDTO();
 		}
+		person.setId(null);
 		person.setFirstName("Carlos Campos");
 		person.setLastName("Seixal");
 		person.setAddress("Portugal");
@@ -152,6 +149,7 @@ public abstract class AbstractIntegrationTest {
 		if (book == null) {
 			book = new BookDTO();
 		}
+		book.setId(null);
 		book.setAuthor("Author Test");
 		book.setLaunchDate(generateLaunchDate());
 		book.setPrice(200.00);
