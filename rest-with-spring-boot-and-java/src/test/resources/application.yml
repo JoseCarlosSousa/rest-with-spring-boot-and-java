@@ -5,7 +5,9 @@ cors:
   originPatterns: http://localhost:8080,http://localhost:5173
 
 file:
-  upload-dir: /Users/sousa/Documents/CursoOnlineComprado/UploadDir
+  #upload-dir: /Users/sousa/Documents/CursoOnlineComprado/UploadDir
+  #rest-with-spring-boot-and-java is the name of the github repository
+  upload-dir: /home/runner/work/rest-with-spring-boot-and-java/UploadDir
 
 
 security:
