@@ -12,20 +12,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 import pt.seixal.carlos.model.Person;
 
 @ExtendWith(SpringExtension.class)
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-//@SpringBootTest
-//@EnableJpaRepositories(basePackages = "pt.seixal.carlos.repository")
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class PersonRepositoryTest extends AbstractIntegrationTest {
+class PersonRepositoryTest {
 
 	@Autowired
 	PersonRepository repository;
@@ -51,7 +51,6 @@ class PersonRepositoryTest extends AbstractIntegrationTest {
 		assertEquals("Boyn", person.getLastName());
 		assertEquals("Apt 653", person.getAddress());
 		assertEquals("Male", person.getGender());
-		// assertTrue(person.getEnabled());
 	}
 
 	@Test
@@ -72,7 +71,5 @@ class PersonRepositoryTest extends AbstractIntegrationTest {
 		assertEquals("Apt 653", person.getAddress());
 		assertEquals("Male", person.getGender());
 		assertFalse(person.getEnabled());
-
 	}
-
 }
