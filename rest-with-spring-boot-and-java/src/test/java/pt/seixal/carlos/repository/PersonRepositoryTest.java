@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
@@ -22,6 +23,7 @@ import pt.seixal.carlos.model.Person;
 
 @ExtendWith(SpringExtension.class)
 //@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@EnableJpaRepositories(basePackages = "pt.seixal.carlos.repository")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PersonRepositoryTest extends AbstractIntegrationTest {
 
