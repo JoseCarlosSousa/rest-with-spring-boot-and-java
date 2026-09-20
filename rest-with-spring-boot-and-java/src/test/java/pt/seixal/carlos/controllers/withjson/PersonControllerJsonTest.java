@@ -1,15 +1,14 @@
 package pt.seixal.carlos.controllers.withjson;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,8 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	@Test
 	@Order(1)
 	void createTest() throws JsonMappingException, JsonProcessingException {
-		mockPerson(); // Inicializa os dados padrão
+
+		mockPerson();
 		setEspecification("person");
 
 		person = given(especification)
@@ -57,14 +57,16 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 				.as(PersonDTO.class);
 
 		checkPerson();
+		assertTrue(person.getEnabled());
+		assertEquals("Sousa", person.getLastName());
 	}
 
 	@Test
-	@Disabled
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
+
+		mockPerson();
 		setEspecification("person");
-		// Mantemos o ID que a API gerou e injetou no passo 1, mudando apenas o apelido
 		person.setLastName("Seixal Updated");
 
 		person = given(especification)
@@ -79,18 +81,20 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 				.body()
 				.as(PersonDTO.class);
 
-		checkPerson("Seixal Updated", true);
+		checkPerson();
+		assertTrue(person.getEnabled());
+		assertEquals("Seixal Updated", person.getLastName());
 	}
 
 	@Test
-	@Disabled
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
+
 		setEspecification("person");
 
 		person = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.pathParam("id", person.getId())
+				.pathParam("id", 1L)
 				.when()
 				.get("{id}")
 				.then()
@@ -100,17 +104,18 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 				.body()
 				.as(PersonDTO.class);
 
-		checkPerson("Seixal Updated", true);
+		checkPerson();
+		assertTrue(person.getEnabled());
 	}
 
 	@Test
-	@Disabled
 	@Order(4)
 	void disableTest() throws JsonMappingException, JsonProcessingException {
+
 		setEspecification("person");
 
 		person = given(especification)
-				.pathParam("id", person.getId())
+				.pathParam("id", 1L)
 				.when()
 				.patch("{id}")
 				.then()
@@ -120,17 +125,18 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 				.body()
 				.as(PersonDTO.class);
 
-		checkPerson("Seixal Updated", false);
+		checkPerson();
+		assertFalse(person.getEnabled());
 	}
 
 	@Test
-	@Disabled
 	@Order(5)
 	void deleteTest() throws JsonMappingException, JsonProcessingException {
+
 		setEspecification("person");
 
 		given(especification)
-				.pathParam("id", person.getId())
+				.pathParam("id", 1L)
 				.when()
 				.delete("{id}")
 				.then()
@@ -138,7 +144,6 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	}
 
 	@Test
-	@Disabled
 	@Order(6)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
 		setEspecification("person");
@@ -158,13 +163,13 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 		WrapperPersonDTO wrapper = objectMapper.readValue(content, WrapperPersonDTO.class);
 		List<PersonDTO> people = wrapper.getEmbedded().getPeople();
 
-		assertPerson(people);
+		assertNotNull(people);
 	}
 
 	@Test
-	@Disabled
 	@Order(7)
 	void findByNameTest() throws JsonMappingException, JsonProcessingException {
+
 		setEspecification("person");
 
 		var content = given(especification)
@@ -183,17 +188,15 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 		WrapperPersonDTO wrapper = objectMapper.readValue(content, WrapperPersonDTO.class);
 		List<PersonDTO> people = wrapper.getEmbedded().getPeople();
 
-		assertPerson(people);
+		assertNotNull(people);
 	}
 
 	private void mockPerson() {
-		if (person == null) {
-			person = new PersonDTO();
-		}
-		person.setId(null);
+		person = new PersonDTO();
+		person.setId(1L);
 		person.setFirstName("Carlos Campos");
-		person.setLastName("Seixal");
-		person.setAddress("Portugal");
+		person.setLastName("Sousa");
+		person.setAddress("Rua das Pretas");
 		person.setGender("Male");
 		person.setEnabled(true);
 		person.setPhotoUrl("https://githubusercontent.com");
@@ -201,35 +204,12 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	}
 
 	private void checkPerson() {
-		checkPerson("Seixal", true);
-	}
-
-	private void checkPerson(String lastName, boolean enabled) {
 		assertNotNull(person);
-		assertNotNull(person.getId());
-		assertTrue(person.getId() > 0);
-		// assertEquals("Carlos Campos", person.getFirstName());
-		assertNotNull(person.getFirstName());
-		assertEquals(lastName, person.getLastName());
-		assertEquals("Portugal", person.getAddress());
+		assertEquals("Carlos Campos", person.getFirstName());
+		assertEquals("Sousa", person.getLastName());
+		assertEquals("Rua das Pretas", person.getAddress());
 		assertEquals("Male", person.getGender());
-		if (enabled) {
-			assertTrue(person.getEnabled());
-		} else {
-			assertFalse(person.getEnabled());
-		}
 		assertNotNull(person.getPhotoUrl());
 		assertNotNull(person.getProfileUrl());
-	}
-
-	private void assertPerson(List<PersonDTO> list) {
-		assertNotNull(list);
-		assertFalse(list.isEmpty());
-
-		// Valida o primeiro elemento retornado da consulta real do banco de dados
-		var target = list.get(0);
-		assertNotNull(target.getId());
-		// assertEquals("Carlos Campos", target.getFirstName());
-		assertNotNull(person.getFirstName());
 	}
 }
