@@ -59,7 +59,7 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
-
+		mockPerson();
 		person.setLastName("Seixal Updated");
 
 		person = given(especification)
@@ -80,7 +80,7 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	@Test
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
-
+		mockPerson();
 		person = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.pathParam("id", person.getId())
@@ -99,7 +99,7 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	@Test
 	@Order(4)
 	void disableTest() throws JsonMappingException, JsonProcessingException {
-
+		mockPerson();
 		person = given(especification)
 				.pathParam("id", person.getId())
 				.when()
@@ -118,7 +118,7 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	@Test
 	@Order(5)
 	void deleteTest() throws JsonMappingException, JsonProcessingException {
-
+		mockPerson();
 		given(especification)
 				.pathParam("id", person.getId())
 				.when()

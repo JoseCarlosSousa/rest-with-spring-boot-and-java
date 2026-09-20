@@ -136,27 +136,7 @@ public abstract class AbstractIntegrationTest {
 
 	protected static void assertPerson(List<PersonDTO> list) {
 		assertNotNull(list);
-		var dto = list.get(0);
-
-		assertEquals("Carlos Campos", dto.getFirstName());
-		assertEquals("Sousa", dto.getLastName());
-		assertEquals("Rua das Pretas", dto.getAddress());
-		assertEquals("Male", dto.getGender());
-		// assertEquals("https://githubusercontent.com",dto.getPhotoUrl());
-		assertNotNull(dto.getPhotoUrl());
-		assertEquals("https://wikipedia.org", dto.getProfileUrl());
-		assertTrue(dto.getEnabled());
-	}
-
-	protected static void assertBooks(List<BookDTO> list) {
-		assertNotNull(list);
-		var dto = list.get(0);
-
-		assertEquals(13, dto.getId());
-		assertEquals("Richard Hunter e George Westerman", dto.getAuthor());
-		assertEquals(95.0, dto.getPrice());
-		assertEquals("O verdadeiro valor de TI", dto.getTitle());
-		assertNotNull(dto.getLaunchDate());
+		checkPerson("Sousa", true);
 	}
 
 	protected static void mockBook() {
@@ -191,6 +171,17 @@ public abstract class AbstractIntegrationTest {
 		assertEquals(generateLaunchDate(), book.getLaunchDate());
 		assertEquals(200.00, book.getPrice());
 		assertEquals("Title Test", book.getTitle());
+	}
+
+	protected static void assertBooks(List<BookDTO> list) {
+		assertNotNull(list);
+		var dto = list.get(0);
+
+		assertEquals(13, dto.getId());
+		assertEquals("Richard Hunter e George Westerman", dto.getAuthor());
+		assertEquals(95.0, dto.getPrice());
+		assertEquals("O verdadeiro valor de TI", dto.getTitle());
+		assertNotNull(dto.getLaunchDate());
 	}
 
 	static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {

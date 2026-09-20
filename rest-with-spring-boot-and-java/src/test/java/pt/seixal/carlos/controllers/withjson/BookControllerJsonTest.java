@@ -60,7 +60,7 @@ class BookControllerJsonTest extends AbstractIntegrationTest {
 
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
-
+		mockBook();
 		book.setAuthor("Rui Oliveira");
 
 		book = given(especification)
@@ -81,6 +81,8 @@ class BookControllerJsonTest extends AbstractIntegrationTest {
 	@Test
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
+		mockBook();
+		book.setAuthor("Rui Oliveira");
 
 		book = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -100,7 +102,7 @@ class BookControllerJsonTest extends AbstractIntegrationTest {
 	@Test
 	@Order(4)
 	void deleteTest() throws JsonMappingException, JsonProcessingException {
-
+		mockBook();
 		given(especification)
 				.pathParam("id", book.getId())
 				.when()
