@@ -1,3 +1,4 @@
+name: my-docker-project
 services:
   db:
     image: mysql:9.1.0
@@ -22,6 +23,7 @@ services:
       - carlos-network
   spring-boot-starter-data-jpa:
     image: kkosmico/curso-java
+    container_name: meu-app-spring
     restart: always
     build: ./rest-with-spring-boot-and-java
     working_dir: /rest-with-spring-boot-and-java

@@ -25,6 +25,7 @@
     <google.zxing.version>3.5.4</google.zxing.version>
     <java-jwt.version>4.4.0</java-jwt.version>    
     <testcontainers.version>1.21.4</testcontainers.version>
+    <mysql.version>9.1.0</mysql.version>
 	</properties>
 	<dependencies>
 	<dependency>
@@ -183,7 +184,7 @@
 					<dependency>
 						<groupId>com.mysql</groupId>
 						<artifactId>mysql-connector-j</artifactId>
-						<version>9.1.0</version>
+      <version>${mysql.version}</version>
 						<exclusions>
 							<exclusion>
 								<groupId>org.slf4j</groupId>

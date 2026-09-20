@@ -24,7 +24,8 @@ spring:
     name: curse-java
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/spring_boot_starter_data_jpa?useTimezone=true&serverTimezone=UTC}
+    #url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/spring_boot_starter_data_jpa?useTimezone=true&serverTimezone=UTC}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3308/docker_db?useTimezone=true&serverTimezone=UTC}
     username: ${SPRING_DATASOURCE_USERNAME:root}
     password: ${SPRING_DATASOURCE_PASSWORD:rootroot}
     driver-class-name: com.mysql.cj.jdbc.Driver
