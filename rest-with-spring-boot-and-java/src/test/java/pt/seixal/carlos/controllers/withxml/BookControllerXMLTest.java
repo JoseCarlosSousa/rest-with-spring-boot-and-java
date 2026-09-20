@@ -69,8 +69,10 @@ class BookControllerXMLTest extends AbstractIntegrationTest {
 	void updateTest() throws JsonMappingException, JsonProcessingException {
 
 		mockBook();
-		setEspecification("book");
+		book.setId(1L);
 		book.setAuthor("Rui Oliveira");
+
+		setEspecification("book");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_XML_VALUE)
@@ -161,7 +163,6 @@ class BookControllerXMLTest extends AbstractIntegrationTest {
 
 	private void mockBook() {
 		book = new BookDTO();
-		book.setId(1L);
 		book.setAuthor("Michael C. Feathers");
 		book.setLaunchDate(generateLaunchDate());
 		book.setPrice(49.00);

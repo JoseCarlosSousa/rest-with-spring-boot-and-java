@@ -112,7 +112,6 @@ public class BookControllerCorsTest extends AbstractIntegrationTest {
 
 	private void mockBook() {
 		book = new BookDTO();
-		book.setId(1L);
 		book.setAuthor("Author Test");
 		book.setLaunchDate(generateLaunchDate());
 		book.setPrice(200.00);

@@ -68,8 +68,10 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 	void updateTest() throws JsonMappingException, JsonProcessingException {
 
 		mockPerson();
-		setEspecification("person");
+		person.setId(1L);
 		person.setLastName("Seixal Updated");
+
+		setEspecification("person");
 
 		person = given()
 				.config(RestAssuredConfig.config()
@@ -203,7 +205,6 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 
 	private void mockPerson() {
 		person = new PersonDTO();
-		person.setId(1L);
 		person.setFirstName("Carlos Campos");
 		person.setLastName("Sousa");
 		person.setAddress("Rua das Pretas");

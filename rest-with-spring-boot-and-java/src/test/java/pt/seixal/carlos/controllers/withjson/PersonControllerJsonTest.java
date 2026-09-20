@@ -66,8 +66,10 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	void updateTest() throws JsonMappingException, JsonProcessingException {
 
 		mockPerson();
-		setEspecification("person");
+		person.setId(1L);
 		person.setLastName("Seixal Updated");
+
+		setEspecification("person");
 
 		person = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -193,7 +195,6 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 
 	private void mockPerson() {
 		person = new PersonDTO();
-		person.setId(1L);
 		person.setFirstName("Carlos Campos");
 		person.setLastName("Sousa");
 		person.setAddress("Rua das Pretas");

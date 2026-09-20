@@ -71,8 +71,10 @@ class BookControllerYAMLTest extends AbstractIntegrationTest {
 	void updateTest() throws JsonMappingException, JsonProcessingException {
 
 		mockBook();
-		setEspecification("book");
+		book.setId(1L);
 		book.setAuthor("Rui Oliveira");
+
+		setEspecification("book");
 
 		book = given()
 				.config(RestAssuredConfig.config()
@@ -165,7 +167,6 @@ class BookControllerYAMLTest extends AbstractIntegrationTest {
 
 	private void mockBook() {
 		book = new BookDTO();
-		book.setId(1L);
 		book.setAuthor("Michael C. Feathers");
 		book.setLaunchDate(generateLaunchDate());
 		book.setPrice(49.00);

@@ -64,8 +64,10 @@ class BookControllerJsonTest extends AbstractIntegrationTest {
 	void updateTest() throws JsonMappingException, JsonProcessingException {
 
 		mockBook();
-		setEspecification("book");
+		book.setId(1L);
 		book.setAuthor("Rui Oliveira");
+
+		setEspecification("book");
 
 		book = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -150,7 +152,6 @@ class BookControllerJsonTest extends AbstractIntegrationTest {
 
 	private void mockBook() {
 		book = new BookDTO();
-		book.setId(1L);
 		book.setAuthor("Michael C. Feathers");
 		book.setLaunchDate(generateLaunchDate());
 		book.setPrice(49.00);

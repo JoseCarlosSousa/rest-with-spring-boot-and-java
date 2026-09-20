@@ -65,8 +65,10 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 	void updateTest() throws JsonMappingException, JsonProcessingException {
 
 		mockPerson();
-		setEspecification("person");
+		person.setId(1L);
 		person.setLastName("Seixal Updated");
+
+		setEspecification("person");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_XML_VALUE)
@@ -173,6 +175,7 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(7)
 	void findByNameTest() throws JsonMappingException, JsonProcessingException {
+
 		setEspecification("person");
 
 		var content = given(especification)
@@ -194,7 +197,6 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 
 	private void mockPerson() {
 		person = new PersonDTO();
-		person.setId(1L);
 		person.setFirstName("Carlos Campos");
 		person.setLastName("Sousa");
 		person.setAddress("Rua das Pretas");

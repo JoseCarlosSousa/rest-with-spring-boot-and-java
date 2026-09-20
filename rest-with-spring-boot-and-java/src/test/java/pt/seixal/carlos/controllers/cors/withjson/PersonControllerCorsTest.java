@@ -111,7 +111,6 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest {
 
 	private void mockPerson() {
 		person = new PersonDTO();
-		person.setId(1L);
 		person.setFirstName("Carlos Campos");
 		person.setLastName("Sousa");
 		person.setAddress("Rua das Pretas");
