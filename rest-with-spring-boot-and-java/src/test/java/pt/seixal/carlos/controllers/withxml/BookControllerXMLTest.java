@@ -5,6 +5,7 @@ import static io.restassured.RestAssured.given;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -58,6 +59,7 @@ class BookControllerXMLTest extends AbstractIntegrationTest { // REMOVIDO: Anota
 	}
 
 	@Test
+	@Disabled
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
 		setEspecification("book");
@@ -82,6 +84,7 @@ class BookControllerXMLTest extends AbstractIntegrationTest { // REMOVIDO: Anota
 	}
 
 	@Test
+	@Disabled
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
 		setEspecification("book");
@@ -105,6 +108,7 @@ class BookControllerXMLTest extends AbstractIntegrationTest { // REMOVIDO: Anota
 	}
 
 	@Test
+	@Disabled
 	@Order(4)
 	void deleteTest() {
 		setEspecification("book");

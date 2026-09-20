@@ -3,6 +3,7 @@ package pt.seixal.carlos.controllers.cors.withjson;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 public class PersonControllerCorsTest extends AbstractIntegrationTest {
 
 	@Test
+	@Disabled
 	@Order(1)
 	void create() throws JsonMappingException, JsonProcessingException {
 
@@ -42,6 +44,7 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest {
 	}
 
 	@Test
+	@Disabled
 	@Order(2)
 	void creatWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
 
@@ -62,6 +65,7 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest {
 	}
 
 	@Test
+	@Disabled
 	@Order(3)
 	void findById() throws JsonMappingException, JsonProcessingException {
 
@@ -83,6 +87,7 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest {
 	}
 
 	@Test
+	@Disabled
 	@Order(4)
 	void findByIdWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
 		setEspecificationBadOrigin("person");

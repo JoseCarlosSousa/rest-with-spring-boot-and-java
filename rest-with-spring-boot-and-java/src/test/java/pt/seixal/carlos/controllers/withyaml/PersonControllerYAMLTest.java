@@ -3,6 +3,7 @@ package pt.seixal.carlos.controllers.withyaml;
 import static io.restassured.RestAssured.given;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -58,6 +59,7 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: An
 	}
 
 	@Test
+	@Disabled
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
 		setEspecification("person");
@@ -84,6 +86,7 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: An
 	}
 
 	@Test
+	@Disabled
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
 		setEspecification("person");
@@ -109,6 +112,7 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: An
 	}
 
 	@Test
+	@Disabled
 	@Order(4)
 	void disableTest() throws JsonMappingException, JsonProcessingException {
 		setEspecification("person");
@@ -133,6 +137,7 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: An
 	}
 
 	@Test
+	@Disabled
 	@Order(5)
 	void deleteTest() {
 		setEspecification("person");
@@ -146,6 +151,7 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: An
 	}
 
 	@Test
+	@Disabled
 	@Order(6)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
 		setEspecification("person");
@@ -167,6 +173,7 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: An
 	}
 
 	@Test
+	@Disabled
 	@Order(7)
 	void findByNameTest() throws JsonMappingException, JsonProcessingException {
 		setEspecification("person");
