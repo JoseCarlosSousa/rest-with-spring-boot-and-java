@@ -4,7 +4,6 @@ import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -22,14 +21,22 @@ import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PersonControllerCorsTest extends AbstractIntegrationTest {
 
-	private PersonDTO person;
+	private static PersonDTO person;
 
 	@Test
 	@Order(1)
 	void create() throws JsonMappingException, JsonProcessingException {
 
-		mockPerson();
-		setEspecification("person");
+		person = new PersonDTO();
+		person.setFirstName("Carlos Campos");
+		person.setLastName("Sousa");
+		person.setAddress("Rua das Pretas");
+		person.setGender("Male");
+		person.setEnabled(true);
+		person.setPhotoUrl("https://githubusercontent.com");
+		person.setProfileUrl("https://wikipedia.org");
+
+		setEspecificationPerson();
 
 		person = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -47,9 +54,58 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest {
 
 	@Test
 	@Order(2)
+	void findById() throws JsonMappingException, JsonProcessingException {
+
+		setEspecificationPerson();
+
+		person = given(especification)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.pathParam("id", person.getId())
+				.when()
+				.get("{id}")
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.as(PersonDTO.class);
+
+		checkPerson();
+
+	}
+
+	@Test
+	@Order(3)
+	void findByIdWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
+
+		setEspecificationBadOrigin("person");
+
+		var content = given(especification)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.pathParam("id", person.getId())
+				.when()
+				.get("{id}")
+				.then()
+				.statusCode(403)
+				.extract()
+				.body()
+				.asString();
+
+		assertEquals("Invalid CORS request", content);
+	}
+
+	@Test
+	@Order(4)
 	void creatWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
 
-		mockPerson();
+		person = new PersonDTO();
+		person.setFirstName("Carlos Campos");
+		person.setLastName("Sousa");
+		person.setAddress("Rua das Pretas");
+		person.setGender("Male");
+		person.setEnabled(true);
+		person.setPhotoUrl("https://githubusercontent.com");
+		person.setProfileUrl("https://wikipedia.org");
+
 		setEspecificationBadOrigin("person");
 
 		var content = given(especification)
@@ -64,60 +120,6 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest {
 				.asString();
 
 		assertEquals("Invalid CORS request", content);
-	}
-
-	@Test
-	@Disabled
-	@Order(3)
-	void findById() throws JsonMappingException, JsonProcessingException {
-
-		setEspecification("person");
-
-		person = given(especification)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.pathParam("id", 1L)
-				.when()
-				.get("{id}")
-				.then()
-				.statusCode(200)
-				.extract()
-				.body()
-				.as(PersonDTO.class);
-
-		checkPerson();
-
-	}
-
-	@Test
-	@Disabled
-	@Order(4)
-	void findByIdWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
-
-		setEspecificationBadOrigin("person");
-
-		var content = given(especification)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.pathParam("id", 1L)
-				.when()
-				.get("{id}")
-				.then()
-				.statusCode(403)
-				.extract()
-				.body()
-				.asString();
-
-		assertEquals("Invalid CORS request", content);
-	}
-
-	private void mockPerson() {
-		person = new PersonDTO();
-		person.setFirstName("Carlos Campos");
-		person.setLastName("Sousa");
-		person.setAddress("Rua das Pretas");
-		person.setGender("Male");
-		person.setEnabled(true);
-		person.setPhotoUrl("https://githubusercontent.com");
-		person.setProfileUrl("https://wikipedia.org");
 	}
 
 	private void checkPerson() {

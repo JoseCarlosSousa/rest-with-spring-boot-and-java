@@ -27,7 +27,7 @@ import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PersonControllerYAMLTest extends AbstractIntegrationTest {
 
-	private PersonDTO person;
+	private static PersonDTO person;
 
 	private static YAMLMapper objectMapper;
 
@@ -40,8 +40,16 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 	@Order(1)
 	void createTest() throws JsonMappingException, JsonProcessingException {
 
-		mockPerson();
-		setEspecification("person");
+		person = new PersonDTO();
+		person.setFirstName("Carlos Campos");
+		person.setLastName("Sousa");
+		person.setAddress("Rua das Pretas");
+		person.setGender("Male");
+		person.setEnabled(true);
+		person.setPhotoUrl("https://githubusercontent.com");
+		person.setProfileUrl("https://wikipedia.org");
+
+		setEspecificationPerson();
 
 		person = given()
 				.config(RestAssuredConfig.config()
@@ -67,11 +75,9 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
 
-		mockPerson();
-		person.setId(1L);
 		person.setLastName("Seixal Updated");
 
-		setEspecification("person");
+		setEspecificationPerson();
 
 		person = given()
 				.config(RestAssuredConfig.config()
@@ -98,7 +104,7 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
 
-		setEspecification("person");
+		setEspecificationPerson();
 
 		person = given()
 				.config(RestAssuredConfig.config()
@@ -107,7 +113,7 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 				.spec(especification)
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.pathParam("id", 1L)
+				.pathParam("id", person.getId())
 				.when()
 				.get("{id}")
 				.then()
@@ -124,7 +130,7 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 	@Order(4)
 	void disableTest() throws JsonMappingException, JsonProcessingException {
 
-		setEspecification("person");
+		setEspecificationPerson();
 
 		person = given()
 				.config(RestAssuredConfig.config()
@@ -132,7 +138,7 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 								.encodeContentTypeAs(MediaType.APPLICATION_YAML_VALUE, ContentType.TEXT)))
 				.spec(especification)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.pathParam("id", 1L)
+				.pathParam("id", person.getId())
 				.when()
 				.patch("{id}")
 				.then()
@@ -149,10 +155,10 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(5)
 	void deleteTest() {
-		setEspecification("person");
+		setEspecificationPerson();
 
 		given(especification)
-				.pathParam("id", 1L)
+				.pathParam("id", person.getId())
 				.when()
 				.delete("{id}")
 				.then()
@@ -163,7 +169,7 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 	@Order(6)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
 
-		setEspecification("person");
+		setEspecificationPerson();
 
 		var people = given(especification)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
@@ -184,7 +190,8 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(7)
 	void findByNameTest() throws JsonMappingException, JsonProcessingException {
-		setEspecification("person");
+
+		setEspecificationPerson();
 
 		var people = given(especification)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
@@ -201,17 +208,6 @@ class PersonControllerYAMLTest extends AbstractIntegrationTest {
 				.getContent();
 
 		assertNotNull(people);
-	}
-
-	private void mockPerson() {
-		person = new PersonDTO();
-		person.setFirstName("Carlos Campos");
-		person.setLastName("Sousa");
-		person.setAddress("Rua das Pretas");
-		person.setGender("Male");
-		person.setEnabled(true);
-		person.setPhotoUrl("https://githubusercontent.com");
-		person.setProfileUrl("https://wikipedia.org");
 	}
 
 	private void checkPerson() {

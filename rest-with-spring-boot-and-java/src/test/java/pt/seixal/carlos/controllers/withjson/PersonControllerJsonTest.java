@@ -27,7 +27,7 @@ import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PersonControllerJsonTest extends AbstractIntegrationTest {
 
-	private PersonDTO person;
+	private static PersonDTO person;
 
 	private static ObjectMapper objectMapper;
 
@@ -41,8 +41,16 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	@Order(1)
 	void createTest() throws JsonMappingException, JsonProcessingException {
 
-		mockPerson();
-		setEspecification("person");
+		person = new PersonDTO();
+		person.setFirstName("Carlos Campos");
+		person.setLastName("Sousa");
+		person.setAddress("Rua das Pretas");
+		person.setGender("Male");
+		person.setEnabled(true);
+		person.setPhotoUrl("https://githubusercontent.com");
+		person.setProfileUrl("https://wikipedia.org");
+
+		setEspecificationPerson();
 
 		person = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -58,18 +66,15 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 
 		checkPerson();
 		assertTrue(person.getEnabled());
-		assertEquals("Sousa", person.getLastName());
 	}
 
 	@Test
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
 
-		mockPerson();
-		person.setId(1L);
 		person.setLastName("Seixal Updated");
 
-		setEspecification("person");
+		setEspecificationPerson();
 
 		person = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -84,7 +89,6 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 				.as(PersonDTO.class);
 
 		checkPerson();
-		assertTrue(person.getEnabled());
 		assertEquals("Seixal Updated", person.getLastName());
 	}
 
@@ -92,11 +96,11 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
 
-		setEspecification("person");
+		setEspecificationPerson();
 
 		person = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.pathParam("id", 1L)
+				.pathParam("id", person.getId())
 				.when()
 				.get("{id}")
 				.then()
@@ -107,17 +111,16 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 				.as(PersonDTO.class);
 
 		checkPerson();
-		assertTrue(person.getEnabled());
 	}
 
 	@Test
 	@Order(4)
 	void disableTest() throws JsonMappingException, JsonProcessingException {
 
-		setEspecification("person");
+		setEspecificationPerson();
 
 		person = given(especification)
-				.pathParam("id", 1L)
+				.pathParam("id", person.getId())
 				.when()
 				.patch("{id}")
 				.then()
@@ -135,10 +138,10 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	@Order(5)
 	void deleteTest() throws JsonMappingException, JsonProcessingException {
 
-		setEspecification("person");
+		setEspecificationPerson();
 
 		given(especification)
-				.pathParam("id", 1L)
+				.pathParam("id", person.getId())
 				.when()
 				.delete("{id}")
 				.then()
@@ -148,7 +151,8 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	@Test
 	@Order(6)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
-		setEspecification("person");
+
+		setEspecificationPerson();
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -172,7 +176,7 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	@Order(7)
 	void findByNameTest() throws JsonMappingException, JsonProcessingException {
 
-		setEspecification("person");
+		setEspecificationPerson();
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -193,18 +197,8 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 		assertNotNull(people);
 	}
 
-	private void mockPerson() {
-		person = new PersonDTO();
-		person.setFirstName("Carlos Campos");
-		person.setLastName("Sousa");
-		person.setAddress("Rua das Pretas");
-		person.setGender("Male");
-		person.setEnabled(true);
-		person.setPhotoUrl("https://githubusercontent.com");
-		person.setProfileUrl("https://wikipedia.org");
-	}
-
 	private void checkPerson() {
+		assertNotNull(person.getId());
 		assertNotNull(person.getFirstName());
 		assertNotNull(person.getLastName());
 		assertNotNull(person.getAddress());

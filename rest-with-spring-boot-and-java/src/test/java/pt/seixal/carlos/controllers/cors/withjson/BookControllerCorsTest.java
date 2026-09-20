@@ -25,14 +25,19 @@ import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BookControllerCorsTest extends AbstractIntegrationTest {
 
-	private BookDTO book;
+	private static BookDTO book;
 
 	@Test
 	@Order(1)
 	void create() throws JsonMappingException, JsonProcessingException {
 
-		mockBook();
-		setEspecification("book");
+		book = new BookDTO();
+		book.setAuthor("Author Test");
+		book.setLaunchDate(generateLaunchDate());
+		book.setPrice(200.00);
+		book.setTitle("Title Test");
+
+		setEspecificationBook();
 
 		book = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -50,9 +55,55 @@ public class BookControllerCorsTest extends AbstractIntegrationTest {
 
 	@Test
 	@Order(2)
+	void findById() throws JsonMappingException, JsonProcessingException {
+
+		setEspecificationBook();
+
+		book = given(especification)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.pathParam("id", book.getId())
+				.when()
+				.get("{id}")
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.as(BookDTO.class);
+
+		checkBook();
+
+	}
+
+	@Test
+	@Order(3)
+	void findByIdWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
+
+		setEspecificationBadOrigin("book");
+
+		var content = given(especification)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.pathParam("id", book.getId())
+				.when()
+				.get("{id}")
+				.then()
+				.statusCode(403)
+				.extract()
+				.body()
+				.asString();
+
+		assertEquals("Invalid CORS request", content);
+	}
+
+	@Test
+	@Order(4)
 	void creatWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
 
-		mockBook();
+		book = new BookDTO();
+		book.setAuthor("Author Test");
+		book.setLaunchDate(generateLaunchDate());
+		book.setPrice(200.00);
+		book.setTitle("Title Test");
+
 		setEspecificationBadOrigin("book");
 
 		var content = given(especification)
@@ -67,55 +118,6 @@ public class BookControllerCorsTest extends AbstractIntegrationTest {
 				.asString();
 
 		assertEquals("Invalid CORS request", content);
-	}
-
-	@Test
-	@Order(3)
-	void findById() throws JsonMappingException, JsonProcessingException {
-
-		setEspecification("book");
-
-		book = given(especification)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.pathParam("id", 1L)
-				.when()
-				.get("{id}")
-				.then()
-				.statusCode(200)
-				.extract()
-				.body()
-				.as(BookDTO.class);
-
-		checkBook();
-
-	}
-
-	@Test
-	@Order(4)
-	void findByIdWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
-
-		setEspecificationBadOrigin("book");
-
-		var content = given(especification)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.pathParam("id", 1L)
-				.when()
-				.get("{id}")
-				.then()
-				.statusCode(403)
-				.extract()
-				.body()
-				.asString();
-
-		assertEquals("Invalid CORS request", content);
-	}
-
-	private void mockBook() {
-		book = new BookDTO();
-		book.setAuthor("Author Test");
-		book.setLaunchDate(generateLaunchDate());
-		book.setPrice(200.00);
-		book.setTitle("Title Test");
 	}
 
 	private void checkBook() {

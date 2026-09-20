@@ -62,8 +62,12 @@ public abstract class AbstractIntegrationTest {
 		}
 	}
 
-	protected void setEspecification(String path) {
-		setEspecification(TestConfigs.ORIGIN_LOCALHOST, path);
+	protected void setEspecificationPerson() {
+		setEspecification(TestConfigs.ORIGIN_LOCALHOST, "person");
+	}
+
+	protected void setEspecificationBook() {
+		setEspecification(TestConfigs.ORIGIN_LOCALHOST, "book");
 	}
 
 	protected void setEspecificationBadOrigin(String path) {

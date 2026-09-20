@@ -30,7 +30,7 @@ import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class BookControllerXMLTest extends AbstractIntegrationTest {
 
-	private BookDTO book;
+	private static BookDTO book;
 	private static XmlMapper objectMapper;
 
 	@BeforeAll
@@ -43,8 +43,13 @@ class BookControllerXMLTest extends AbstractIntegrationTest {
 	@Order(1)
 	void createTest() throws JsonMappingException, JsonProcessingException {
 
-		mockBook();
-		setEspecification("book");
+		book = new BookDTO();
+		book.setAuthor("Michael C. Feathers");
+		book.setLaunchDate(generateLaunchDate());
+		book.setPrice(49.00);
+		book.setTitle("Working effectively with legacy code");
+
+		setEspecificationBook();
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_XML_VALUE)
@@ -68,11 +73,9 @@ class BookControllerXMLTest extends AbstractIntegrationTest {
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
 
-		mockBook();
-		book.setId(1L);
 		book.setAuthor("Rui Oliveira");
 
-		setEspecification("book");
+		setEspecificationBook();
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_XML_VALUE)
@@ -97,12 +100,12 @@ class BookControllerXMLTest extends AbstractIntegrationTest {
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
 
-		setEspecification("book");
+		setEspecificationBook();
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_XML_VALUE)
 				.accept(MediaType.APPLICATION_XML_VALUE)
-				.pathParam("id", 1L)
+				.pathParam("id", book.getId())
 				.when()
 				.get("{id}")
 				.then()
@@ -120,10 +123,10 @@ class BookControllerXMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(4)
 	void deleteTest() {
-		setEspecification("book");
+		setEspecificationBook();
 
 		given(especification)
-				.pathParam("id", 1L)
+				.pathParam("id", book.getId())
 				.when()
 				.delete("{id}")
 				.then()
@@ -134,7 +137,7 @@ class BookControllerXMLTest extends AbstractIntegrationTest {
 	@Order(5)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
 
-		setEspecification("book");
+		setEspecificationBook();
 
 		var content = given(especification)
 				.accept(MediaType.APPLICATION_XML_VALUE)
@@ -159,14 +162,6 @@ class BookControllerXMLTest extends AbstractIntegrationTest {
 			assertNotNull(books.get(i).getPrice());
 			assertNotNull(books.get(i).getLaunchDate());
 		}
-	}
-
-	private void mockBook() {
-		book = new BookDTO();
-		book.setAuthor("Michael C. Feathers");
-		book.setLaunchDate(generateLaunchDate());
-		book.setPrice(49.00);
-		book.setTitle("Working effectively with legacy code");
 	}
 
 	private void checkBook() {
