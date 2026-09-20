@@ -12,29 +12,30 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 import pt.seixal.carlos.model.Person;
 
 @ExtendWith(SpringExtension.class)
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+// Força o ambiente Web dinâmico para não falhar a injeção de propriedades da classe-mãe
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class PersonRepositoryTest {
+class PersonRepositoryTest extends AbstractIntegrationTest { // <--- VOLTOU A ESTENDER a classe base para ter o MySQL do
+																// Testcontainers
 
 	@Autowired
 	PersonRepository repository;
 
-	private static Person person;
+	private static Person personInstance;
 
 	@BeforeAll
-	static void setUp() {
-		person = new Person();
+	static void setUpAll() {
+		personInstance = new Person();
 	}
 
 	@Test
@@ -42,34 +43,34 @@ class PersonRepositoryTest {
 	void testFindPeopleByName() {
 		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "firstName"));
 
-		person = repository.findPeopleByName("and", pageable).getContent().get(0);
+		personInstance = repository.findPeopleByName("and", pageable).getContent().get(0);
 
-		assertNotNull(person);
-		assertNotNull(person.getId());
+		assertNotNull(personInstance);
+		assertNotNull(personInstance.getId());
 
-		assertEquals("Aland", person.getFirstName());
-		assertEquals("Boyn", person.getLastName());
-		assertEquals("Apt 653", person.getAddress());
-		assertEquals("Male", person.getGender());
+		assertEquals("Aland", personInstance.getFirstName());
+		assertEquals("Boyn", personInstance.getLastName());
+		assertEquals("Apt 653", personInstance.getAddress());
+		assertEquals("Male", personInstance.getGender());
 	}
 
 	@Test
 	@Order(2)
 	@Disabled
 	void testDisablePerson() {
-		Long id = person.getId();
+		Long id = personInstance.getId();
 		repository.disablePerson(id);
 
 		var result = repository.findById(id);
-		person = result.get();
+		personInstance = result.get();
 
-		assertNotNull(person);
-		assertNotNull(person.getId());
+		assertNotNull(personInstance);
+		assertNotNull(personInstance.getId());
 
-		assertEquals("Aland", person.getFirstName());
-		assertEquals("Boyn", person.getLastName());
-		assertEquals("Apt 653", person.getAddress());
-		assertEquals("Male", person.getGender());
-		assertFalse(person.getEnabled());
+		assertEquals("Aland", personInstance.getFirstName());
+		assertEquals("Boyn", personInstance.getLastName());
+		assertEquals("Apt 653", personInstance.getAddress());
+		assertEquals("Male", personInstance.getGender());
+		assertFalse(personInstance.getEnabled());
 	}
 }
