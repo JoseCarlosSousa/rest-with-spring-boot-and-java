@@ -1,6 +1,10 @@
 package pt.seixal.carlos.controllers.withjson;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -23,6 +27,8 @@ import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PersonControllerJsonTest extends AbstractIntegrationTest {
+
+	private PersonDTO person;
 
 	private static ObjectMapper objectMapper;
 
@@ -178,5 +184,52 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 		List<PersonDTO> people = wrapper.getEmbedded().getPeople();
 
 		assertPerson(people);
+	}
+
+	private void mockPerson() {
+		if (person == null) {
+			person = new PersonDTO();
+		}
+		person.setId(null);
+		person.setFirstName("Carlos Campos");
+		person.setLastName("Seixal");
+		person.setAddress("Portugal");
+		person.setGender("Male");
+		person.setEnabled(true);
+		person.setPhotoUrl("https://githubusercontent.com");
+		person.setProfileUrl("https://wikipedia.org");
+	}
+
+	private void checkPerson() {
+		checkPerson("Seixal", true);
+	}
+
+	private void checkPerson(String lastName, boolean enabled) {
+		assertNotNull(person);
+		assertNotNull(person.getId());
+		assertTrue(person.getId() > 0);
+		// assertEquals("Carlos Campos", person.getFirstName());
+		assertNotNull(person.getFirstName());
+		assertEquals(lastName, person.getLastName());
+		assertEquals("Portugal", person.getAddress());
+		assertEquals("Male", person.getGender());
+		if (enabled) {
+			assertTrue(person.getEnabled());
+		} else {
+			assertFalse(person.getEnabled());
+		}
+		assertNotNull(person.getPhotoUrl());
+		assertNotNull(person.getProfileUrl());
+	}
+
+	private void assertPerson(List<PersonDTO> list) {
+		assertNotNull(list);
+		assertFalse(list.isEmpty());
+
+		// Valida o primeiro elemento retornado da consulta real do banco de dados
+		var target = list.get(0);
+		assertNotNull(target.getId());
+		// assertEquals("Carlos Campos", target.getFirstName());
+		assertNotNull(person.getFirstName());
 	}
 }

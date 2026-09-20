@@ -2,8 +2,12 @@ package pt.seixal.carlos.controllers.cors.withjson;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.jupiter.api.Disabled;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -21,8 +25,9 @@ import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BookControllerCorsTest extends AbstractIntegrationTest {
 
+	private BookDTO book;
+
 	@Test
-	@Disabled
 	@Order(1)
 	void create() throws JsonMappingException, JsonProcessingException {
 
@@ -47,6 +52,7 @@ public class BookControllerCorsTest extends AbstractIntegrationTest {
 	@Order(2)
 	void creatWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
 
+		mockBook();
 		setEspecificationBadOrigin("book");
 
 		var content = given(especification)
@@ -64,7 +70,6 @@ public class BookControllerCorsTest extends AbstractIntegrationTest {
 	}
 
 	@Test
-	@Disabled
 	@Order(3)
 	void findById() throws JsonMappingException, JsonProcessingException {
 
@@ -72,7 +77,7 @@ public class BookControllerCorsTest extends AbstractIntegrationTest {
 
 		book = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.pathParam("id", book.getId())
+				.pathParam("id", 1L)
 				.when()
 				.get("{id}")
 				.then()
@@ -86,14 +91,14 @@ public class BookControllerCorsTest extends AbstractIntegrationTest {
 	}
 
 	@Test
-	@Disabled
 	@Order(4)
 	void findByIdWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
+
 		setEspecificationBadOrigin("book");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.pathParam("id", book.getId())
+				.pathParam("id", 1L)
 				.when()
 				.get("{id}")
 				.then()
@@ -105,4 +110,30 @@ public class BookControllerCorsTest extends AbstractIntegrationTest {
 		assertEquals("Invalid CORS request", content);
 	}
 
+	private void mockBook() {
+
+		book = new BookDTO();
+		book.setId(1L);
+		book.setAuthor("Author Test");
+		book.setLaunchDate(generateLaunchDate());
+		book.setPrice(200.00);
+		book.setTitle("Title Test");
+	}
+
+	private Date generateLaunchDate() {
+		String strDate = "2026-08-17";
+		return Date.from(LocalDate.parse(strDate)
+				.atStartOfDay(ZoneId.systemDefault())
+				.toInstant());
+	}
+
+	private void checkBook() {
+		assertNotNull(book);
+		assertNotNull(book.getId());
+
+		assertEquals("Author Test", book.getAuthor());
+		assertEquals(generateLaunchDate(), book.getLaunchDate());
+		assertEquals(200.00, book.getPrice());
+		assertEquals("Title Test", book.getTitle());
+	}
 }

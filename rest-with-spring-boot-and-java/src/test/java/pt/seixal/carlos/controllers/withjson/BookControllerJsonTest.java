@@ -1,8 +1,12 @@
 package pt.seixal.carlos.controllers.withjson;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -25,7 +29,7 @@ import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class BookControllerJsonTest extends AbstractIntegrationTest { // REMOVIDO: Anotação @SpringBootTest duplicada com porta
 																// fixa
-
+	private BookDTO book;
 	private static ObjectMapper objectMapper;
 
 	@BeforeAll
@@ -141,5 +145,48 @@ class BookControllerJsonTest extends AbstractIntegrationTest { // REMOVIDO: Anot
 			assertNotNull(books.get(i).getPrice());
 			assertNotNull(books.get(i).getLaunchDate());
 		}
+	}
+
+	private void mockBook() {
+		if (book == null) {
+			book = new BookDTO();
+		}
+		book.setId(null);
+		book.setAuthor("Author Test");
+		book.setLaunchDate(generateLaunchDate());
+		book.setPrice(200.00);
+		book.setTitle("Title Test");
+	}
+
+	private Date generateLaunchDate() {
+		String strDate = "2026-08-17";
+		return Date.from(LocalDate.parse(strDate)
+				.atStartOfDay(ZoneId.systemDefault())
+				.toInstant());
+	}
+
+	private void checkBook() {
+		checkBook("Author Test");
+	}
+
+	private void checkBook(String author) {
+		assertNotNull(book);
+		assertNotNull(book.getId());
+
+		assertEquals(author, book.getAuthor());
+		assertEquals(generateLaunchDate(), book.getLaunchDate());
+		assertEquals(200.00, book.getPrice());
+		assertEquals("Title Test", book.getTitle());
+	}
+
+	private void assertBooks(List<BookDTO> list) {
+		assertNotNull(list);
+		var dto = list.get(0);
+
+		assertEquals(13, dto.getId());
+		assertEquals("Richard Hunter e George Westerman", dto.getAuthor());
+		assertEquals(95.0, dto.getPrice());
+		assertEquals("O verdadeiro valor de TI", dto.getTitle());
+		assertNotNull(dto.getLaunchDate());
 	}
 }
