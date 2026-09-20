@@ -24,7 +24,7 @@ import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 import pt.seixal.carlos.model.Person;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PersonRepositoryTest extends AbstractIntegrationTest {
 
