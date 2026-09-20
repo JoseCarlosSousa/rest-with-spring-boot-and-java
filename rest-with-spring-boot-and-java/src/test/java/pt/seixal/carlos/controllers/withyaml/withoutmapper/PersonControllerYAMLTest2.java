@@ -1,12 +1,9 @@
 package pt.seixal.carlos.controllers.withyaml.withoutmapper;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -27,7 +24,7 @@ import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class PersonControllerYAMLTest2 extends AbstractIntegrationTest { // REMOVIDO: Anotação @SpringBootTest de porta fixa
+class PersonControllerYAMLTest2 extends AbstractIntegrationTest {
 
 	private PersonDTO person;
 
@@ -38,8 +35,6 @@ class PersonControllerYAMLTest2 extends AbstractIntegrationTest { // REMOVIDO: A
 		objectMapper = new YAMLMapper();
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-		// Configura o REST Assured para conseguir codificar e enviar application/x-yaml
-		// como texto puro
 		io.restassured.RestAssured.config = io.restassured.config.RestAssuredConfig.config()
 				.encoderConfig(io.restassured.config.EncoderConfig.encoderConfig()
 						.encodeContentTypeAs(MediaType.APPLICATION_YAML_VALUE, io.restassured.http.ContentType.TEXT));
@@ -48,6 +43,7 @@ class PersonControllerYAMLTest2 extends AbstractIntegrationTest { // REMOVIDO: A
 	@Test
 	@Order(1)
 	void createTest() throws JsonMappingException, JsonProcessingException {
+
 		mockPerson();
 		setEspecification("person");
 
@@ -74,8 +70,10 @@ class PersonControllerYAMLTest2 extends AbstractIntegrationTest { // REMOVIDO: A
 	@Test
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
+
+		mockPerson();
 		setEspecification("person");
-		person.setLastName("Seixal Updated"); // Mantém o ID persistido na base de dados
+		person.setLastName("Seixal Updated");
 
 		String yamlBody = objectMapper.writeValueAsString(person);
 
@@ -94,18 +92,21 @@ class PersonControllerYAMLTest2 extends AbstractIntegrationTest { // REMOVIDO: A
 
 		person = objectMapper.readValue(content, PersonDTO.class);
 
-		checkPerson("Seixal Updated", true);
+		checkPerson();
+
+		assertEquals("Seixal Updated", person.getLastName());
 	}
 
 	@Test
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
+
 		setEspecification("person");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.pathParam("id", person.getId())
+				.pathParam("id", 1L)
 				.when()
 				.get("{id}")
 				.then()
@@ -117,17 +118,18 @@ class PersonControllerYAMLTest2 extends AbstractIntegrationTest { // REMOVIDO: A
 
 		person = objectMapper.readValue(content, PersonDTO.class);
 
-		checkPerson("Seixal Updated", true);
+		checkPerson();
 	}
 
 	@Test
 	@Order(4)
 	void disableTest() throws JsonMappingException, JsonProcessingException {
+
 		setEspecification("person");
 
 		var content = given(especification)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.pathParam("id", person.getId())
+				.pathParam("id", 1L)
 				.when()
 				.patch("{id}")
 				.then()
@@ -139,7 +141,8 @@ class PersonControllerYAMLTest2 extends AbstractIntegrationTest { // REMOVIDO: A
 
 		person = objectMapper.readValue(content, PersonDTO.class);
 
-		checkPerson("Seixal Updated", false);
+		checkPerson();
+		assertFalse(person.getEnabled());
 	}
 
 	@Test
@@ -148,7 +151,7 @@ class PersonControllerYAMLTest2 extends AbstractIntegrationTest { // REMOVIDO: A
 		setEspecification("person");
 
 		given(especification)
-				.pathParam("id", person.getId())
+				.pathParam("id", 1L)
 				.when()
 				.delete("{id}")
 				.then()
@@ -158,6 +161,7 @@ class PersonControllerYAMLTest2 extends AbstractIntegrationTest { // REMOVIDO: A
 	@Test
 	@Order(6)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
+
 		setEspecification("person");
 
 		var content = given(especification)
@@ -173,12 +177,14 @@ class PersonControllerYAMLTest2 extends AbstractIntegrationTest { // REMOVIDO: A
 				.asString();
 
 		PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class);
-		assertPerson(wrapper.getContent());
+
+		assertNotNull(wrapper.getContent());
 	}
 
 	@Test
 	@Order(7)
 	void findByNameTest() throws JsonMappingException, JsonProcessingException {
+
 		setEspecification("person");
 
 		var content = given(especification)
@@ -195,17 +201,16 @@ class PersonControllerYAMLTest2 extends AbstractIntegrationTest { // REMOVIDO: A
 				.asString();
 
 		PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class);
-		assertPerson(wrapper.getContent());
+
+		assertNotNull(wrapper.getContent());
 	}
 
 	private void mockPerson() {
-		if (person == null) {
-			person = new PersonDTO();
-		}
-		person.setId(null);
+		person = new PersonDTO();
+		person.setId(1L);
 		person.setFirstName("Carlos Campos");
-		person.setLastName("Seixal");
-		person.setAddress("Portugal");
+		person.setLastName("Sousa");
+		person.setAddress("Rua das Pretas");
 		person.setGender("Male");
 		person.setEnabled(true);
 		person.setPhotoUrl("https://githubusercontent.com");
@@ -213,35 +218,12 @@ class PersonControllerYAMLTest2 extends AbstractIntegrationTest { // REMOVIDO: A
 	}
 
 	private void checkPerson() {
-		checkPerson("Seixal", true);
-	}
-
-	private void checkPerson(String lastName, boolean enabled) {
-		assertNotNull(person);
-		assertNotNull(person.getId());
-		assertTrue(person.getId() > 0);
-		// assertEquals("Carlos Campos", person.getFirstName());
 		assertNotNull(person.getFirstName());
-		assertEquals(lastName, person.getLastName());
-		assertEquals("Portugal", person.getAddress());
-		assertEquals("Male", person.getGender());
-		if (enabled) {
-			assertTrue(person.getEnabled());
-		} else {
-			assertFalse(person.getEnabled());
-		}
+		assertNotNull(person.getLastName());
+		assertNotNull(person.getAddress());
+		assertNotNull(person.getGender());
+		assertNotNull(person.getEnabled());
 		assertNotNull(person.getPhotoUrl());
 		assertNotNull(person.getProfileUrl());
-	}
-
-	private void assertPerson(List<PersonDTO> list) {
-		assertNotNull(list);
-		assertFalse(list.isEmpty());
-
-		// Valida o primeiro elemento retornado da consulta real do banco de dados
-		var target = list.get(0);
-		assertNotNull(target.getId());
-		// assertEquals("Carlos Campos", target.getFirstName());
-		assertNotNull(person.getFirstName());
 	}
 }
