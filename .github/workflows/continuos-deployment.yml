@@ -27,18 +27,16 @@ jobs:
         cache: maven
 
     - name: Build Application .jar
-      # Se o pom.xml está na raiz, remove a linha do working-directory ou altera para '.'
-      working-directory: .
+      working-directory: rest-with-spring-boot-and-java
       run: mvn clean package
 
     - name: Docker Compose Build
-      # Altera também aqui para a raiz
       working-directory: .
       run: docker compose build
-
 
     - name: Push to Docker Hub Container Registry
       run: |
         docker tag ${{ secrets.DOCKER_USERNAME }}/curso-java:latest ${{ secrets.DOCKER_USERNAME }}/curso-java:${{ github.run_id }}
         docker push ${{ secrets.DOCKER_USERNAME }}/curso-java:latest
         docker push ${{ secrets.DOCKER_USERNAME }}/curso-java:${{ github.run_id }}
+
