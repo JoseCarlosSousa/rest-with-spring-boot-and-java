@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -36,9 +36,12 @@ import pt.seixal.carlos.data.dto.v1.PersonDTO;
 import pt.seixal.carlos.data.dto.v1.security.AccountCredentialsDTO;
 import pt.seixal.carlos.data.dto.v1.security.TokenDTO;
 
-@TestInstance(Lifecycle.PER_CLASS)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(initializers = AbstractIntegrationTest.Initializer.class)
 public abstract class AbstractIntegrationTest {
+
+	@LocalServerPort
+	protected int dynamicPort;
 
 	protected static String sharedAccessToken;
 	protected static String refreshAccessToken;
@@ -47,7 +50,7 @@ public abstract class AbstractIntegrationTest {
 	protected static PersonDTO person;
 	protected static BookDTO book;
 
-	@BeforeAll
+	@BeforeEach
 	void setUpDefinition() {
 		person = new PersonDTO();
 		book = new BookDTO();
@@ -57,7 +60,7 @@ public abstract class AbstractIntegrationTest {
 
 			TokenDTO loginResult = given()
 					.basePath("/auth/signin")
-					.port(TestConfigs.SERVER_PORT)
+					.port(dynamicPort)
 					.contentType(MediaType.APPLICATION_JSON_VALUE)
 					.body(credentials)
 					.when()
@@ -74,20 +77,20 @@ public abstract class AbstractIntegrationTest {
 		}
 	}
 
-	protected static void setEspecification(String path) {
+	protected void setEspecification(String path) {
 		setEspecification(TestConfigs.ORIGIN_LOCALHOST, path);
 	}
 
-	protected static void setEspecificationBadOrigin(String path) {
+	protected void setEspecificationBadOrigin(String path) {
 		setEspecification(TestConfigs.ORIGIN_OTHER, path);
 	}
 
-	private static void setEspecification(String origin, String path) {
+	private void setEspecification(String origin, String path) {
 		especification = new RequestSpecBuilder()
 				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, origin)
 				.addHeader("Authorization", "Bearer " + sharedAccessToken)
 				.setBasePath("/api/" + path + "/v1")
-				.setPort(TestConfigs.SERVER_PORT)
+				.setPort(dynamicPort)
 				.addFilter(new RequestLoggingFilter(LogDetail.ALL))
 				.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
 				.build();
@@ -100,8 +103,8 @@ public abstract class AbstractIntegrationTest {
 		person.setGender("Male");
 		person.setEnabled(true);
 		person.setPhotoUrl(
-				"https://raw.githubusercontent.com/leandrocgsi/rest-with-spring-boot-and-java-erudio/refs/heads/main/photos/01_senna.jpg");
-		person.setProfileUrl("https://en.wikipedia.org/wiki/Ayrton_Senna");
+				"https://githubusercontent.com");
+		person.setProfileUrl("https://wikipedia.org");
 	}
 
 	protected static void checkPerson() {
@@ -126,7 +129,6 @@ public abstract class AbstractIntegrationTest {
 	}
 
 	protected static void assertPerson(List<PersonDTO> list) {
-
 		assertNotNull(list);
 		var dto = list.get(0);
 
@@ -135,9 +137,9 @@ public abstract class AbstractIntegrationTest {
 		assertEquals("Rua das Pretas", dto.getAddress());
 		assertEquals("Male", dto.getGender());
 		assertEquals(
-				"https://raw.githubusercontent.com/leandrocgsi/rest-with-spring-boot-and-java-erudio/refs/heads/main/photos/01_senna.jpg",
+				"https://githubusercontent.com",
 				dto.getPhotoUrl());
-		assertEquals("https://en.wikipedia.org/wiki/Ayrton_Senna", dto.getProfileUrl());
+		assertEquals("https://wikipedia.org", dto.getProfileUrl());
 		assertTrue(dto.getEnabled());
 	}
 
@@ -205,6 +207,5 @@ public abstract class AbstractIntegrationTest {
 			MapPropertySource testcontainers = new MapPropertySource("testcontainers", createConnectionConfiguration());
 			environment.getPropertySources().addFirst(testcontainers);
 		}
-
 	}
 }
