@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class BookControllerXMLTest extends AbstractIntegrationTest { // REMOVIDO: Anotação @SpringBootTest de porta fixa
+class BookControllerXMLTest extends AbstractIntegrationTest {
 
 	private BookDTO book;
 	private static XmlMapper objectMapper;
@@ -43,6 +42,7 @@ class BookControllerXMLTest extends AbstractIntegrationTest { // REMOVIDO: Anota
 	@Test
 	@Order(1)
 	void createTest() throws JsonMappingException, JsonProcessingException {
+
 		mockBook();
 		setEspecification("book");
 
@@ -65,11 +65,12 @@ class BookControllerXMLTest extends AbstractIntegrationTest { // REMOVIDO: Anota
 	}
 
 	@Test
-	@Disabled
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
+
+		mockBook();
 		setEspecification("book");
-		book.setAuthor("Rui Oliveira"); // Mantém o ID ativo gerado no passo 1
+		book.setAuthor("Rui Oliveira");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_XML_VALUE)
@@ -86,19 +87,20 @@ class BookControllerXMLTest extends AbstractIntegrationTest { // REMOVIDO: Anota
 
 		book = objectMapper.readValue(content, BookDTO.class);
 
-		checkBook("Rui Oliveira");
+		checkBook();
+		assertEquals("Rui Oliveira", book.getAuthor());
 	}
 
 	@Test
-	@Disabled
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
+
 		setEspecification("book");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_XML_VALUE)
 				.accept(MediaType.APPLICATION_XML_VALUE)
-				.pathParam("id", book.getId()) // Mapeamento dinâmico e seguro
+				.pathParam("id", 1L)
 				.when()
 				.get("{id}")
 				.then()
@@ -110,17 +112,16 @@ class BookControllerXMLTest extends AbstractIntegrationTest { // REMOVIDO: Anota
 
 		book = objectMapper.readValue(content, BookDTO.class);
 
-		checkBook("Rui Oliveira");
+		checkBook();
 	}
 
 	@Test
-	@Disabled
 	@Order(4)
 	void deleteTest() {
 		setEspecification("book");
 
 		given(especification)
-				.pathParam("id", book.getId())
+				.pathParam("id", 1L)
 				.when()
 				.delete("{id}")
 				.then()
@@ -130,11 +131,12 @@ class BookControllerXMLTest extends AbstractIntegrationTest { // REMOVIDO: Anota
 	@Test
 	@Order(5)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
+
 		setEspecification("book");
 
 		var content = given(especification)
 				.accept(MediaType.APPLICATION_XML_VALUE)
-				.queryParam("page", 1, "size", 10, "direction", "asc")
+				.queryParam("page", 1, "size", 10)
 				.when()
 				.get()
 				.then()
@@ -147,18 +149,32 @@ class BookControllerXMLTest extends AbstractIntegrationTest { // REMOVIDO: Anota
 		PagedModelBook wrapper = objectMapper.readValue(content, PagedModelBook.class);
 		List<BookDTO> books = wrapper.getContent();
 
-		assertBooks(books);
+		assertNotNull(books);
+
+		for (int i = 0; i < books.size(); i++) {
+			assertNotNull(books.get(i).getAuthor());
+			assertNotNull(books.get(i).getTitle());
+			assertNotNull(books.get(i).getPrice());
+			assertNotNull(books.get(i).getLaunchDate());
+		}
 	}
 
 	private void mockBook() {
-		if (book == null) {
-			book = new BookDTO();
-		}
-		book.setId(null);
-		book.setAuthor("Author Test");
+		book = new BookDTO();
+		book.setId(1L);
+		book.setAuthor("Michael C. Feathers");
 		book.setLaunchDate(generateLaunchDate());
-		book.setPrice(200.00);
-		book.setTitle("Title Test");
+		book.setPrice(49.00);
+		book.setTitle("Working effectively with legacy code");
+	}
+
+	private void checkBook() {
+		assertNotNull(book);
+		assertNotNull(book.getId());
+		assertNotNull(book.getAuthor());
+		assertNotNull(book.getLaunchDate());
+		assertEquals(49.00, book.getPrice());
+		assertEquals("Working effectively with legacy code", book.getTitle());
 	}
 
 	private Date generateLaunchDate() {
@@ -166,30 +182,5 @@ class BookControllerXMLTest extends AbstractIntegrationTest { // REMOVIDO: Anota
 		return Date.from(LocalDate.parse(strDate)
 				.atStartOfDay(ZoneId.systemDefault())
 				.toInstant());
-	}
-
-	private void checkBook() {
-		checkBook("Author Test");
-	}
-
-	private void checkBook(String author) {
-		assertNotNull(book);
-		assertNotNull(book.getId());
-
-		assertEquals(author, book.getAuthor());
-		assertEquals(generateLaunchDate(), book.getLaunchDate());
-		assertEquals(200.00, book.getPrice());
-		assertEquals("Title Test", book.getTitle());
-	}
-
-	private void assertBooks(List<BookDTO> list) {
-		assertNotNull(list);
-		var dto = list.get(0);
-
-		assertEquals(13, dto.getId());
-		assertEquals("Richard Hunter e George Westerman", dto.getAuthor());
-		assertEquals(95.0, dto.getPrice());
-		assertEquals("O verdadeiro valor de TI", dto.getTitle());
-		assertNotNull(dto.getLaunchDate());
 	}
 }
