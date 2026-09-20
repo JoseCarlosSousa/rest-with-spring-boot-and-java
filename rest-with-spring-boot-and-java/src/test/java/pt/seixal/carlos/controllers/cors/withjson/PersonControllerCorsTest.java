@@ -2,11 +2,8 @@ package pt.seixal.carlos.controllers.cors.withjson;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
@@ -29,7 +26,6 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest {
 	private PersonDTO person;
 
 	@Test
-	@Disabled
 	@Order(1)
 	void create() throws JsonMappingException, JsonProcessingException {
 
@@ -51,10 +47,10 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest {
 	}
 
 	@Test
-	@Disabled
 	@Order(2)
 	void creatWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
 
+		mockPerson();
 		setEspecificationBadOrigin("person");
 
 		var content = given(especification)
@@ -80,7 +76,7 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest {
 
 		person = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.pathParam("id", person.getId())
+				.pathParam("id", 1L)
 				.when()
 				.get("{id}")
 				.then()
@@ -97,11 +93,12 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest {
 	@Disabled
 	@Order(4)
 	void findByIdWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
+
 		setEspecificationBadOrigin("person");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.pathParam("id", person.getId())
+				.pathParam("id", 1L)
 				.when()
 				.get("{id}")
 				.then()
@@ -114,13 +111,11 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest {
 	}
 
 	private void mockPerson() {
-		if (person == null) {
-			person = new PersonDTO();
-		}
-		person.setId(null);
+		person = new PersonDTO();
+		person.setId(1L);
 		person.setFirstName("Carlos Campos");
-		person.setLastName("Seixal");
-		person.setAddress("Portugal");
+		person.setLastName("Sousa");
+		person.setAddress("Rua das Pretas");
 		person.setGender("Male");
 		person.setEnabled(true);
 		person.setPhotoUrl("https://githubusercontent.com");
@@ -128,36 +123,14 @@ public class PersonControllerCorsTest extends AbstractIntegrationTest {
 	}
 
 	private void checkPerson() {
-		checkPerson("Seixal", true);
-	}
-
-	private void checkPerson(String lastName, boolean enabled) {
 		assertNotNull(person);
-		assertNotNull(person.getId());
-		assertTrue(person.getId() > 0);
-		// assertEquals("Carlos Campos", person.getFirstName());
-		assertNotNull(person.getFirstName());
-		assertEquals(lastName, person.getLastName());
-		assertEquals("Portugal", person.getAddress());
+		assertEquals("Carlos Campos", person.getFirstName());
+		assertEquals("Sousa", person.getLastName());
+		assertEquals("Rua das Pretas", person.getAddress());
 		assertEquals("Male", person.getGender());
-		if (enabled) {
-			assertTrue(person.getEnabled());
-		} else {
-			assertFalse(person.getEnabled());
-		}
+		assertTrue(person.getEnabled());
 		assertNotNull(person.getPhotoUrl());
 		assertNotNull(person.getProfileUrl());
-	}
-
-	private void assertPerson(List<PersonDTO> list) {
-		assertNotNull(list);
-		assertFalse(list.isEmpty());
-
-		// Valida o primeiro elemento retornado da consulta real do banco de dados
-		var target = list.get(0);
-		assertNotNull(target.getId());
-		// assertEquals("Carlos Campos", target.getFirstName());
-		assertNotNull(person.getFirstName());
 	}
 
 }
