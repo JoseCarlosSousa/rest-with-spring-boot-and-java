@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -17,16 +16,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 import pt.seixal.carlos.model.Person;
 
 @ExtendWith(SpringExtension.class)
-// Força o ambiente Web dinâmico para não falhar a injeção de propriedades da classe-mãe
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class PersonRepositoryTest extends AbstractIntegrationTest { // <--- VOLTOU A ESTENDER a classe base para ter o MySQL do
-																// Testcontainers
+class PersonRepositoryTest extends AbstractIntegrationTest {
 
 	@Autowired
 	PersonRepository repository;
@@ -56,7 +54,7 @@ class PersonRepositoryTest extends AbstractIntegrationTest { // <--- VOLTOU A ES
 
 	@Test
 	@Order(2)
-	@Disabled
+	@Transactional
 	void testDisablePerson() {
 		Long id = personInstance.getId();
 		repository.disablePerson(id);
