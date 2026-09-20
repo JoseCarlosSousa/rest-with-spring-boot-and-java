@@ -67,7 +67,7 @@ public abstract class AbstractIntegrationTest {
 					.extract()
 					.body()
 					.jsonPath()
-					.getObject("body", TokenDTO.class);
+					.getObject("", TokenDTO.class);
 
 			sharedAccessToken = loginResult.getAccessToken();
 			refreshAccessToken = loginResult.getRefreshToken();
