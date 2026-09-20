@@ -106,7 +106,7 @@ public abstract class AbstractIntegrationTest {
 		if (person == null) {
 			person = new PersonDTO();
 		}
-		person.setFirstName("Carlos");
+		person.setFirstName("Carlos Campos");
 		person.setLastName("Seixal");
 		person.setAddress("Portugal");
 		person.setGender("Male");
@@ -123,7 +123,7 @@ public abstract class AbstractIntegrationTest {
 		assertNotNull(person);
 		assertNotNull(person.getId());
 		assertTrue(person.getId() > 0);
-		assertEquals("Carlos", person.getFirstName());
+		assertEquals("Carlos Campos", person.getFirstName());
 		assertEquals(lastName, person.getLastName());
 		assertEquals("Portugal", person.getAddress());
 		assertEquals("Male", person.getGender());
@@ -143,7 +143,7 @@ public abstract class AbstractIntegrationTest {
 		// Valida o primeiro elemento retornado da consulta real do banco de dados
 		var target = list.get(0);
 		assertNotNull(target.getId());
-		assertEquals("Carlos", target.getFirstName());
+		assertEquals("Carlos Campos", target.getFirstName());
 	}
 
 	protected static void mockBook() {
