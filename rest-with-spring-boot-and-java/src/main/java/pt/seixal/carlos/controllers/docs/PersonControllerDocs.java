@@ -49,7 +49,7 @@ public interface PersonControllerDocs {
 			MediaTypes.XLSX,
 			MediaTypes.PDF
 	})
-	@Operation(summary = "Export people", description = "Export a Page od People in XLSX and CSV format", tags = {
+	@Operation(summary = "Export people", description = "Export a Page of People in XLSX and CSV format", tags = {
 			"People" }, responses = {
 					@ApiResponse(description = "Success", responseCode = "200", content = {
 							@Content(mediaType = MediaTypes.CSV),
@@ -70,7 +70,7 @@ public interface PersonControllerDocs {
 			MediaTypes.XLSX,
 			MediaTypes.PDF
 	})
-	@Operation(summary = "Export person", description = "Export a Page od person in XLSX, CSV or PDF format", tags = {
+	@Operation(summary = "Export person", description = "Export a Page of a person in XLSX, CSV or PDF format", tags = {
 			"People" }, responses = {
 					@ApiResponse(description = "Success", responseCode = "200", content = {
 							@Content(mediaType = MediaTypes.CSV),

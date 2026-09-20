@@ -53,6 +53,9 @@ public class PersonService {
 	FileExporterFactory exporter;
 
 	@Autowired
+	private ExportService exportService;
+
+	@Autowired
 	PagedResourcesAssembler<PersonDTO> assembler;
 
 	public PagedModel<EntityModel<PersonDTO>> findAll(Map<String, String> params) {
@@ -63,42 +66,29 @@ public class PersonService {
 	}
 
 	public PagedModel<EntityModel<PersonDTO>> findByName(String firstName, Map<String, String> params) {
-		logger.info("Finding People!");
+		logger.info("Finding a person by name!");
 		Pageable pageable = PageableUtils.getPageable(params);
 		return buildPageModel(params, repository.findPeopleByName(firstName, pageable));
 	}
 
 	public Resource exportPage(Map<String, String> params, String acceptHeader) {
-		logger.info("Finding all people!");
-
-		Pageable pageable = PageableUtils.getPageable(params);
-		var people = repository.findAll(pageable)
-				.map(person -> parseObject(person, PersonDTO.class))
-				.getContent();
-
+		logger.info("Finding all people to export!");
 		FileExporter exporter = this.exporter.getExporter(acceptHeader);
 
-		try {
-			return exporter.exportPeople(people);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("Error exporting file: " + e.getMessage(), e);
-		}
+		return exportService.exportPage(
+				params,
+				acceptHeader,
+				repository::findAll,
+				PersonDTO.class,
+				exporter::exportPeople);
 	}
 
 	public Resource exportPerson(Long id, String acceptHeader) {
 		logger.info("Exporting data of one Person!");
-
 		var dto = parseObject(getPerson(id), PersonDTO.class);
-
 		FileExporter exporter = this.exporter.getExporter(acceptHeader);
 
-		try {
-			return exporter.exportPerson(dto);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("Error exporting file: " + e.getMessage(), e);
-		}
+		return exportService.exportSingle(dto, exporter::exportPerson);
 	}
 
 	public PersonDTO findById(Long id) {

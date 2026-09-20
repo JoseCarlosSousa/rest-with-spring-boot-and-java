@@ -1,5 +1,8 @@
 package pt.seixal.carlos.controllers.docs;
 
+import java.util.Map;
+
+import org.springframework.core.io.Resource;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
@@ -17,7 +20,9 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import pt.seixal.carlos.data.dto.v1.UserDTO;
+import pt.seixal.carlos.file.exporter.MediaTypes;
 
 public interface UserControllerDocs {
 
@@ -34,10 +39,47 @@ public interface UserControllerDocs {
 					@ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
 					@ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
 			})
-	ResponseEntity<PagedModel<EntityModel<UserDTO>>> findAll(
-			@RequestParam(value = "page", defaultValue = "0") int page,
-			@RequestParam(value = "size", defaultValue = "12") int size,
-			@RequestParam(value = "direction", defaultValue = "asc") String direction);
+	ResponseEntity<PagedModel<EntityModel<UserDTO>>> findAll(@RequestParam Map<String, String> allParams);
+
+	@GetMapping(value = "/exportPage", produces = {
+			MediaTypes.CSV,
+			MediaTypes.XLSX,
+			MediaTypes.PDF
+	})
+	@Operation(summary = "Export users", description = "Export a Page of users in PDF, Excel or CSV format", tags = {
+			"User" }, responses = {
+					@ApiResponse(description = "Success", responseCode = "200", content = {
+							@Content(mediaType = MediaTypes.CSV),
+							@Content(mediaType = MediaTypes.XLSX),
+							@Content(mediaType = MediaTypes.PDF)
+					}),
+					@ApiResponse(description = "No content", responseCode = "204", content = @Content),
+					@ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+					@ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+					@ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+			})
+	ResponseEntity<Resource> exportPage(
+			@RequestParam Map<String, String> allParams,
+			HttpServletRequest request);
+
+	@GetMapping(value = "/export/{id}", produces = {
+			MediaTypes.CSV,
+			MediaTypes.XLSX,
+			MediaTypes.PDF
+	})
+	@Operation(summary = "Export User", description = "Export a users in PDF, Excel or CSV format", tags = {
+			"User" }, responses = {
+					@ApiResponse(description = "Success", responseCode = "200", content = {
+							@Content(mediaType = MediaTypes.CSV),
+							@Content(mediaType = MediaTypes.XLSX),
+							@Content(mediaType = MediaTypes.PDF)
+					}),
+					@ApiResponse(description = "No content", responseCode = "204", content = @Content),
+					@ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+					@ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+					@ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+			})
+	ResponseEntity<Resource> export(@PathVariable("id") Long id, HttpServletRequest request);
 
 	@GetMapping(value = "/{id}", produces = {
 			MediaType.APPLICATION_JSON_VALUE,

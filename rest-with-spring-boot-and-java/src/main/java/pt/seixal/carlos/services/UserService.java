@@ -11,12 +11,13 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,10 +31,14 @@ import pt.seixal.carlos.controllers.UserController;
 import pt.seixal.carlos.data.dto.v1.UserDTO;
 import pt.seixal.carlos.exceptions.RequiredObjectIsNullException;
 import pt.seixal.carlos.exceptions.ResourceNotFoundException;
+import pt.seixal.carlos.file.exporter.contract.FileExporter;
+import pt.seixal.carlos.file.exporter.factory.FileExporterFactory;
 import pt.seixal.carlos.model.Permission;
 import pt.seixal.carlos.model.User;
 import pt.seixal.carlos.repository.PermissionRepository;
 import pt.seixal.carlos.repository.UserRepository;
+import pt.seixal.carlos.util.PageableUtils;
+import pt.seixal.carlos.util.PagedModelUtils;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -45,6 +50,12 @@ public class UserService implements UserDetailsService {
 
 	@Autowired
 	PermissionRepository permissionRepository;
+
+	@Autowired
+	FileExporterFactory exporter;
+
+	@Autowired
+	private ExportService exportService;
 
 	@Autowired
 	PagedResourcesAssembler<UserDTO> assembler;
@@ -118,23 +129,11 @@ public class UserService implements UserDetailsService {
 		return userDTO;
 	}
 
-	public PagedModel<EntityModel<UserDTO>> findAll(Pageable pageable) {
+	public PagedModel<EntityModel<UserDTO>> findAll(Map<String, String> params) {
 		logger.info("Finding all users!");
 
-		var users = repository.findAll(pageable);
-
-		var peopleWithLinks = users.map(user -> {
-			var dto = parseObject(user, UserDTO.class);
-			addHateoasLinks(dto);
-			return dto;
-		});
-
-		Link findAllLink = WebMvcLinkBuilder.linkTo(
-				WebMvcLinkBuilder.methodOn(UserController.class)
-						.findAll(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().toString()))
-				.withSelfRel();
-
-		return assembler.toModel(peopleWithLinks, findAllLink);
+		Pageable pageable = PageableUtils.getPageable(params);
+		return buildPageModel(params, repository.findAll(pageable));
 	}
 
 	public UserDTO findById(Long id) {
@@ -142,6 +141,22 @@ public class UserService implements UserDetailsService {
 		var dto = parseObject(getUser(id), UserDTO.class);
 		addHateoasLinks(dto);
 		return dto;
+	}
+
+	public Resource exportPage(Map<String, String> params, String acceptHeader) {
+		FileExporter exporter = this.exporter.getExporter(acceptHeader);
+		return exportService.exportPage(
+				params,
+				acceptHeader,
+				repository::findAll,
+				UserDTO.class,
+				exporter::exportUsers);
+	}
+
+	public Resource exportUser(Long id, String acceptHeader) {
+		var dto = parseObject(getUser(id), UserDTO.class);
+		FileExporter exporter = this.exporter.getExporter(acceptHeader);
+		return exportService.exportSingle(dto, exporter::exportUser);
 	}
 
 	private User getUser(Long id) {
@@ -159,9 +174,25 @@ public class UserService implements UserDetailsService {
 		return passwordEncoder.encode(password);
 	}
 
+	private PagedModel<EntityModel<UserDTO>> buildPageModel(Map<String, String> params, Page<User> users) {
+		Link findAllLink = linkTo(methodOn(UserController.class).findAll(params)).withSelfRel();
+
+		return PagedModelUtils.buildPageModel(
+				params,
+				users,
+				UserDTO.class,
+				assembler,
+				findAllLink,
+				this::addHateoasLinks);
+	}
+
 	private void addHateoasLinks(UserDTO dto) {
+		addHateoasLinks(dto, null);
+	}
+
+	private void addHateoasLinks(UserDTO dto, Map<String, String> params) {
 		dto.add(linkTo(methodOn(UserController.class).findById(dto.getId())).withSelfRel().withType("GET"));
-		dto.add(linkTo(methodOn(UserController.class).findAll(0, 12, "asc")).withRel("findAll").withType("GET"));
+		dto.add(linkTo(methodOn(UserController.class).findAll(params)).withRel("findAll").withType("GET"));
 		dto.add(linkTo(methodOn(UserController.class).create(dto)).withRel("create").withType("POST"));
 		dto.add(linkTo(methodOn(UserController.class).update(dto)).withRel("update").withType("PUT"));
 		dto.add(linkTo(methodOn(UserController.class).delete(dto.getId())).withRel("delete").withType("DELETE"));

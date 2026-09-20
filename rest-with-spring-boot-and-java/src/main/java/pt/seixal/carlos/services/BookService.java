@@ -9,6 +9,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -21,6 +22,9 @@ import pt.seixal.carlos.controllers.BookController;
 import pt.seixal.carlos.data.dto.v1.BookDTO;
 import pt.seixal.carlos.exceptions.RequiredObjectIsNullException;
 import pt.seixal.carlos.exceptions.ResourceNotFoundException;
+import pt.seixal.carlos.file.exporter.contract.FileExporter;
+import pt.seixal.carlos.file.exporter.factory.FileExporterFactory;
+import pt.seixal.carlos.file.importer.factory.FileImporterFactory;
 import pt.seixal.carlos.model.Book;
 import pt.seixal.carlos.repository.BookRepository;
 import pt.seixal.carlos.util.PageableUtils;
@@ -35,6 +39,15 @@ public class BookService {
 	BookRepository repository;
 
 	@Autowired
+	FileImporterFactory importer;
+
+	@Autowired
+	FileExporterFactory exporter;
+
+	@Autowired
+	private ExportService exportService;
+
+	@Autowired
 	PagedResourcesAssembler<BookDTO> assembler;
 
 	public PagedModel<EntityModel<BookDTO>> findAll(Map<String, String> params) {
@@ -42,6 +55,26 @@ public class BookService {
 
 		Pageable pageable = PageableUtils.getPageable(params);
 		return buildPageModel(params, repository.findAll(pageable));
+	}
+
+	public Resource exportPage(Map<String, String> params, String acceptHeader) {
+		logger.info("Finding all Books to export!");
+		FileExporter exporter = this.exporter.getExporter(acceptHeader);
+
+		return exportService.exportPage(
+				params,
+				acceptHeader,
+				repository::findAll,
+				BookDTO.class,
+				exporter::exportBooks);
+	}
+
+	public Resource exportBook(Long id, String acceptHeader) {
+		logger.info("Exporting data of one book!");
+		var dto = parseObject(getBook(id), BookDTO.class);
+		FileExporter exporter = this.exporter.getExporter(acceptHeader);
+
+		return exportService.exportSingle(dto, exporter::exportBook);
 	}
 
 	public BookDTO findById(Long id) {
