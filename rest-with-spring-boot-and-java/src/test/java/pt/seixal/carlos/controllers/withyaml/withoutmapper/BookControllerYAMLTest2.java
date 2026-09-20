@@ -9,7 +9,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,9 +20,8 @@ import pt.seixal.carlos.data.dto.v1.BookDTO;
 import pt.seixal.carlos.dto.wrappers.xml.PagedModelBook;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class BookControllerYAMLTest2 extends AbstractIntegrationTest {
+class BookControllerYAMLTest2 extends AbstractIntegrationTest { // REMOVIDO: Anotação @SpringBootTest de porta fixa
 
 	private static YAMLMapper objectMapper;
 
@@ -42,7 +40,6 @@ class BookControllerYAMLTest2 extends AbstractIntegrationTest {
 	@Test
 	@Order(1)
 	void createTest() throws JsonMappingException, JsonProcessingException {
-
 		mockBook();
 		setEspecification("book");
 
@@ -69,8 +66,9 @@ class BookControllerYAMLTest2 extends AbstractIntegrationTest {
 	@Test
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
+		setEspecification("book");
+		book.setAuthor("Rui Oliveira"); // Reaproveita o ID estável obtido do createTest()
 
-		book.setAuthor("Rui Oliveira");
 		String yamlBody = objectMapper.writeValueAsString(book);
 
 		var content = given(especification)
@@ -94,11 +92,12 @@ class BookControllerYAMLTest2 extends AbstractIntegrationTest {
 	@Test
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
+		setEspecification("book");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.pathParam("id", book.getId())
+				.pathParam("id", book.getId()) // Leitura segura do identificador ativo
 				.when()
 				.get("{id}")
 				.then()
@@ -116,6 +115,7 @@ class BookControllerYAMLTest2 extends AbstractIntegrationTest {
 	@Test
 	@Order(4)
 	void deleteTest() {
+		setEspecification("book");
 
 		given(especification)
 				.pathParam("id", book.getId())
@@ -128,6 +128,7 @@ class BookControllerYAMLTest2 extends AbstractIntegrationTest {
 	@Test
 	@Order(5)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
+		setEspecification("book");
 
 		var content = given(especification)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
@@ -145,7 +146,5 @@ class BookControllerYAMLTest2 extends AbstractIntegrationTest {
 		List<BookDTO> books = wrapper.getContent();
 
 		assertBooks(books);
-
 	}
-
 }

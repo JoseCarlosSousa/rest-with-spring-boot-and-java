@@ -7,7 +7,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -19,9 +18,8 @@ import pt.seixal.carlos.data.dto.v1.PersonDTO;
 import pt.seixal.carlos.dto.wrappers.xml.PagedModelPerson;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class PersonControllerXMLTest extends AbstractIntegrationTest {
+class PersonControllerXMLTest extends AbstractIntegrationTest { // REMOVIDO: Anotação @SpringBootTest de porta fixa
 
 	private static XmlMapper objectMapper;
 
@@ -34,7 +32,6 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(1)
 	void createTest() throws JsonMappingException, JsonProcessingException {
-
 		mockPerson();
 		setEspecification("person");
 
@@ -59,8 +56,8 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
-
-		person.setLastName("Seixal Updated");
+		setEspecification("person");
+		person.setLastName("Seixal Updated"); // Mantém o ID ativo gerado no passo 1
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_XML_VALUE)
@@ -83,6 +80,7 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
+		setEspecification("person");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_XML_VALUE)
@@ -105,6 +103,7 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(4)
 	void disableTest() throws JsonMappingException, JsonProcessingException {
+		setEspecification("person");
 
 		var content = given(especification)
 				.accept(MediaType.APPLICATION_XML_VALUE)
@@ -126,6 +125,7 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(5)
 	void deleteTest() {
+		setEspecification("person");
 
 		given(especification)
 				.pathParam("id", person.getId())
@@ -138,6 +138,7 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(6)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
+		setEspecification("person");
 
 		var content = given(especification)
 				.accept(MediaType.APPLICATION_XML_VALUE)
@@ -153,12 +154,12 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 
 		PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class);
 		assertPerson(wrapper.getContent());
-
 	}
 
 	@Test
 	@Order(7)
 	void findByNameTest() throws JsonMappingException, JsonProcessingException {
+		setEspecification("person");
 
 		var content = given(especification)
 				.accept(MediaType.APPLICATION_XML_VALUE)
@@ -175,6 +176,5 @@ class PersonControllerXMLTest extends AbstractIntegrationTest {
 
 		PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class);
 		assertPerson(wrapper.getContent());
-
 	}
 }

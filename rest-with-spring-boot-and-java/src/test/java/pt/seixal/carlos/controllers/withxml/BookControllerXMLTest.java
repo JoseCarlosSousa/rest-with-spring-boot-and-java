@@ -9,7 +9,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,9 +20,8 @@ import pt.seixal.carlos.data.dto.v1.BookDTO;
 import pt.seixal.carlos.dto.wrappers.xml.PagedModelBook;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class BookControllerXMLTest extends AbstractIntegrationTest {
+class BookControllerXMLTest extends AbstractIntegrationTest { // REMOVIDO: Anotação @SpringBootTest de porta fixa
 
 	private static XmlMapper objectMapper;
 
@@ -36,7 +34,6 @@ class BookControllerXMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(1)
 	void createTest() throws JsonMappingException, JsonProcessingException {
-
 		mockBook();
 		setEspecification("book");
 
@@ -61,8 +58,8 @@ class BookControllerXMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
-
-		book.setAuthor("Rui Oliveira");
+		setEspecification("book");
+		book.setAuthor("Rui Oliveira"); // Mantém o ID ativo gerado no passo 1
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_XML_VALUE)
@@ -85,11 +82,12 @@ class BookControllerXMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
+		setEspecification("book");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_XML_VALUE)
 				.accept(MediaType.APPLICATION_XML_VALUE)
-				.pathParam("id", book.getId())
+				.pathParam("id", book.getId()) // Mapeamento dinâmico e seguro
 				.when()
 				.get("{id}")
 				.then()
@@ -107,6 +105,7 @@ class BookControllerXMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(4)
 	void deleteTest() {
+		setEspecification("book");
 
 		given(especification)
 				.pathParam("id", book.getId())
@@ -119,6 +118,7 @@ class BookControllerXMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(5)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
+		setEspecification("book");
 
 		var content = given(especification)
 				.accept(MediaType.APPLICATION_XML_VALUE)

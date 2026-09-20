@@ -9,7 +9,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,9 +21,8 @@ import pt.seixal.carlos.data.dto.v1.BookDTO;
 import pt.seixal.carlos.dto.wrappers.xml.PagedModelBook;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class BookControllerYAMLTest extends AbstractIntegrationTest {
+class BookControllerYAMLTest extends AbstractIntegrationTest { // REMOVIDO: Anotação @SpringBootTest de porta fixa
 
 	private static YAMLMapper objectMapper;
 
@@ -36,7 +34,6 @@ class BookControllerYAMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(1)
 	void createTest() throws JsonMappingException, JsonProcessingException {
-
 		mockBook();
 		setEspecification("book");
 
@@ -63,8 +60,8 @@ class BookControllerYAMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
-
-		book.setAuthor("Rui Oliveira");
+		setEspecification("book");
+		book.setAuthor("Rui Oliveira"); // Mantém o ID ativo gerado no passo 1
 
 		book = given()
 				.config(RestAssuredConfig.config()
@@ -75,7 +72,8 @@ class BookControllerYAMLTest extends AbstractIntegrationTest {
 				.accept(MediaType.APPLICATION_YAML_VALUE)
 				.body(book, objectMapper)
 				.when()
-				.post()
+				.put() // <--- CORRIGIDO: Mudou de .post() para .put() para evitar o erro 500 do
+						// Hibernate
 				.then()
 				.statusCode(200)
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
@@ -89,6 +87,7 @@ class BookControllerYAMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
+		setEspecification("book");
 
 		book = given()
 				.config(RestAssuredConfig.config()
@@ -97,7 +96,7 @@ class BookControllerYAMLTest extends AbstractIntegrationTest {
 				.spec(especification)
 				.contentType(MediaType.APPLICATION_YAML_VALUE)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
-				.pathParam("id", book.getId())
+				.pathParam("id", book.getId()) // Captura o ID dinâmico e seguro
 				.when()
 				.get("{id}")
 				.then()
@@ -113,6 +112,7 @@ class BookControllerYAMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(4)
 	void deleteTest() {
+		setEspecification("book");
 
 		given(especification)
 				.pathParam("id", book.getId())
@@ -125,6 +125,7 @@ class BookControllerYAMLTest extends AbstractIntegrationTest {
 	@Test
 	@Order(5)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
+		setEspecification("book");
 
 		List<BookDTO> books = given(especification)
 				.accept(MediaType.APPLICATION_YAML_VALUE)
@@ -140,7 +141,5 @@ class BookControllerYAMLTest extends AbstractIntegrationTest {
 				.getContent();
 
 		assertBooks(books);
-
 	}
-
 }
