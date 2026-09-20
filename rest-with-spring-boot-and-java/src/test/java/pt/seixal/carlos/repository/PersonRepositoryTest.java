@@ -13,11 +13,13 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import io.restassured.RestAssured;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 import pt.seixal.carlos.model.Person;
 
@@ -26,6 +28,9 @@ import pt.seixal.carlos.model.Person;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PersonRepositoryTest extends AbstractIntegrationTest {
 
+	@LocalServerPort
+	private static int port;
+
 	@Autowired
 	PersonRepository repository;
 	private static Person person;
@@ -33,6 +38,9 @@ class PersonRepositoryTest extends AbstractIntegrationTest {
 	@BeforeAll
 	static void setUp() {
 		person = new Person();
+
+		RestAssured.port = port;
+		RestAssured.basePath = "/api/person";
 	}
 
 	@Test
