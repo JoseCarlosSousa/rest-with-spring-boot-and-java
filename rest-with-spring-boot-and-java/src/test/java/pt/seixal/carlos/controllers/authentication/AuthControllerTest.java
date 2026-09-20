@@ -9,15 +9,18 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 
-import pt.seixal.carlos.config.TestConfigs;
 import pt.seixal.carlos.data.dto.v1.security.TokenDTO;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AuthControllerTest extends AbstractIntegrationTest {
+
+	@LocalServerPort
+	protected int dynamicPort;
 
 	@BeforeAll
 	static void setUp() {
@@ -37,7 +40,7 @@ public class AuthControllerTest extends AbstractIntegrationTest {
 
 		var newTokenDTO = given()
 				.basePath("/auth/refresh")
-				.port(TestConfigs.SERVER_PORT)
+				.port(dynamicPort)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.pathParam("username", "carlos")
 				.header("Authorization", "Bearer " + refreshAccessToken)
