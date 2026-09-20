@@ -52,8 +52,14 @@ public abstract class AbstractIntegrationTest {
 
 	@BeforeEach
 	void setUpDefinition() {
-		person = new PersonDTO();
-		book = new BookDTO();
+		// Proteção: Só cria instâncias novas se os testes anteriores ainda não as
+		// tiverem populado
+		if (person == null || person.getId() == null) {
+			person = new PersonDTO();
+		}
+		if (book == null || book.getId() == null) {
+			book = new BookDTO();
+		}
 
 		if (sharedAccessToken == null || sharedAccessToken.isBlank()) {
 			var credentials = new AccountCredentialsDTO("carlos", "admin123");
@@ -100,16 +106,12 @@ public abstract class AbstractIntegrationTest {
 		if (person == null) {
 			person = new PersonDTO();
 		}
-		if (person.getId() == null) {
-			person.setId(1L);
-		}
 		person.setFirstName("Carlos");
 		person.setLastName("Seixal");
 		person.setAddress("Portugal");
 		person.setGender("Male");
 		person.setEnabled(true);
-		person.setPhotoUrl(
-				"https://githubusercontent.com");
+		person.setPhotoUrl("https://githubusercontent.com");
 		person.setProfileUrl("https://wikipedia.org");
 	}
 
@@ -136,15 +138,17 @@ public abstract class AbstractIntegrationTest {
 
 	protected static void assertPerson(List<PersonDTO> list) {
 		assertNotNull(list);
-		checkPerson("Sousa", true);
+		assertFalse(list.isEmpty());
+
+		// Valida o primeiro elemento retornado da consulta real do banco de dados
+		var target = list.get(0);
+		assertNotNull(target.getId());
+		assertEquals("Carlos", target.getFirstName());
 	}
 
 	protected static void mockBook() {
 		if (book == null) {
 			book = new BookDTO();
-		}
-		if (book.getId() == null) {
-			book.setId(1L);
 		}
 		book.setAuthor("Author Test");
 		book.setLaunchDate(generateLaunchDate());

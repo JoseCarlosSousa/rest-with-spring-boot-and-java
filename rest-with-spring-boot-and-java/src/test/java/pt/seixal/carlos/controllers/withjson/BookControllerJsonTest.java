@@ -10,7 +10,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,9 +21,9 @@ import pt.seixal.carlos.data.dto.v1.BookDTO;
 import pt.seixal.carlos.dto.wrappers.json.WrapperBookDTO;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class BookControllerJsonTest extends AbstractIntegrationTest {
+class BookControllerJsonTest extends AbstractIntegrationTest { // REMOVIDO: Anotação @SpringBootTest duplicada com porta
+																// fixa
 
 	private static ObjectMapper objectMapper;
 
@@ -37,8 +36,7 @@ class BookControllerJsonTest extends AbstractIntegrationTest {
 	@Test
 	@Order(1)
 	void createTest() throws JsonMappingException, JsonProcessingException {
-
-		mockBook();
+		mockBook(); // Inicializa os dados e insere o ID padrão inicial
 		setEspecification("book");
 
 		book = given(especification)
@@ -57,10 +55,10 @@ class BookControllerJsonTest extends AbstractIntegrationTest {
 	}
 
 	@Test
-
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
-		mockBook();
+		setEspecification("book");
+		// Mantém o ID real persistido pelo banco de dados no passo 1
 		book.setAuthor("Rui Oliveira");
 
 		book = given(especification)
@@ -81,12 +79,11 @@ class BookControllerJsonTest extends AbstractIntegrationTest {
 	@Test
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
-		mockBook();
-		book.setAuthor("Rui Oliveira");
+		setEspecification("book");
 
 		book = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.pathParam("id", book.getId())
+				.pathParam("id", book.getId()) // Lê o ID de forma dinâmica e segura
 				.when()
 				.get("{id}")
 				.then()
@@ -102,7 +99,8 @@ class BookControllerJsonTest extends AbstractIntegrationTest {
 	@Test
 	@Order(4)
 	void deleteTest() throws JsonMappingException, JsonProcessingException {
-		mockBook();
+		setEspecification("book");
+
 		given(especification)
 				.pathParam("id", book.getId())
 				.when()
@@ -114,6 +112,7 @@ class BookControllerJsonTest extends AbstractIntegrationTest {
 	@Test
 	@Order(5)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
+		setEspecification("book");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)

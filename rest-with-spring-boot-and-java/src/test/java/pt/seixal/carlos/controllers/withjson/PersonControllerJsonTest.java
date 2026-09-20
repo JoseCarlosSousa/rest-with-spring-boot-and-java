@@ -9,7 +9,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,7 +20,6 @@ import pt.seixal.carlos.data.dto.v1.PersonDTO;
 import pt.seixal.carlos.dto.wrappers.json.WrapperPersonDTO;
 import pt.seixal.carlos.integrationtests.testcontainers.AbstractIntegrationTest;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PersonControllerJsonTest extends AbstractIntegrationTest {
 
@@ -36,8 +34,7 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	@Test
 	@Order(1)
 	void createTest() throws JsonMappingException, JsonProcessingException {
-
-		mockPerson();
+		mockPerson(); // Inicializa os dados padrão
 		setEspecification("person");
 
 		person = given(especification)
@@ -56,10 +53,10 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	}
 
 	@Test
-
 	@Order(2)
 	void updateTest() throws JsonMappingException, JsonProcessingException {
-		mockPerson();
+		setEspecification("person");
+		// Mantemos o ID que a API gerou e injetou no passo 1, mudando apenas o apelido
 		person.setLastName("Seixal Updated");
 
 		person = given(especification)
@@ -80,7 +77,8 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	@Test
 	@Order(3)
 	void findByIdTest() throws JsonMappingException, JsonProcessingException {
-		mockPerson();
+		setEspecification("person");
+
 		person = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.pathParam("id", person.getId())
@@ -99,7 +97,8 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	@Test
 	@Order(4)
 	void disableTest() throws JsonMappingException, JsonProcessingException {
-		mockPerson();
+		setEspecification("person");
+
 		person = given(especification)
 				.pathParam("id", person.getId())
 				.when()
@@ -112,13 +111,13 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 				.as(PersonDTO.class);
 
 		checkPerson("Seixal Updated", false);
-
 	}
 
 	@Test
 	@Order(5)
 	void deleteTest() throws JsonMappingException, JsonProcessingException {
-		mockPerson();
+		setEspecification("person");
+
 		given(especification)
 				.pathParam("id", person.getId())
 				.when()
@@ -130,6 +129,7 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 	@Test
 	@Order(6)
 	void findAllTest() throws JsonMappingException, JsonProcessingException {
+		setEspecification("person");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -147,12 +147,12 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 		List<PersonDTO> people = wrapper.getEmbedded().getPeople();
 
 		assertPerson(people);
-
 	}
 
 	@Test
 	@Order(7)
 	void findByNameTest() throws JsonMappingException, JsonProcessingException {
+		setEspecification("person");
 
 		var content = given(especification)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -169,7 +169,7 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 
 		WrapperPersonDTO wrapper = objectMapper.readValue(content, WrapperPersonDTO.class);
 		List<PersonDTO> people = wrapper.getEmbedded().getPeople();
-		assertPerson(people);
 
+		assertPerson(people);
 	}
 }
