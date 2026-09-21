@@ -30,6 +30,9 @@ spring:
 #docker tag 6bea4a6f3bf1 891048843252.dkr.ecr.us-east-1.amazonaws.com/carlos/curso-java:latest
 #docker push 891048843252.dkr.ecr.us-east-1.amazonaws.com/carlos/curso-java:latest
 
+#Comando para sacar definitions
+#aws ecs describe-task-definition --task-definition task-carlos-java-curse --query taskDefinition > task-definition.json
+#open -e task-definition.json
 
   datasource:
     #url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/spring_boot_starter_data_jpa?useTimezone=true&serverTimezone=UTC}
