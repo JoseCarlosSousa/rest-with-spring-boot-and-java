@@ -7,6 +7,8 @@ import java.util.Objects;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import pt.seixal.carlos.model.Permission;
 
 @Relation(collectionRelation = "users")
@@ -17,6 +19,7 @@ public class UserDTO extends RepresentationModel<UserDTO> implements Serializabl
 	private Long id;
 	private String userName;
 	private String fullName;
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private String password;
 	private boolean accountNonExpired;
 	private boolean accountNonLocked;

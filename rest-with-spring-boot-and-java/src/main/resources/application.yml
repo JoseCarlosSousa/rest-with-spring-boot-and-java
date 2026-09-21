@@ -20,12 +20,25 @@ email:
 spring:
   application:
     name: curse-java
-  
+
+#echo $JDBC_URL
+#docker image ls
+#mvn clean package OR mvn clean package -f rest-with-spring-boot-and-java/pom.xml
+#Comandos correctos para AWS devido ao mac M3
+#aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 891048843252.dkr.ecr.us-east-1.amazonaws.com 
+#DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose up -d --build
+#docker tag 6bea4a6f3bf1 891048843252.dkr.ecr.us-east-1.amazonaws.com/carlos/curso-java:latest
+#docker push 891048843252.dkr.ecr.us-east-1.amazonaws.com/carlos/curso-java:latest
+
+
   datasource:
     #url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/spring_boot_starter_data_jpa?useTimezone=true&serverTimezone=UTC}
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3308/docker_bd?useTimezone=true&serverTimezone=UTC}
+    #url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3308/docker_bd?useTimezone=true&serverTimezone=UTC}
+    #url: ${SPRING_DATASOURCE_URL:jdbc:mysql://carlos-aws-db.cch2c88mqoc5.us-east-1.rds.amazonaws.com/aws_db?useTimezone=true&serverTimezone=UTC}
+    url: ${JDBC_URL}       
     username: ${SPRING_DATASOURCE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_PASSWORD:rootroot}
+    #password: ${SPRING_DATASOURCE_PASSWORD:rootroot}
+    password: ${SPRING_DATASOURCE_PASSWORD:Admin123}
   
   flyway:
     enabled: true
