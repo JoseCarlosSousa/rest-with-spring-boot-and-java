@@ -27,7 +27,7 @@ public class OpenApiConfig {
 										.scheme("bearer")
 										.bearerFormat("JWT")))
 				.info(new Info()
-						.title("Curso API")
+						.title("Restful, Java, Spring Boot, Kubernetes an Docker!")
 						.version("1.0")
 						.description("Curso API description")
 						.termsOfService("http://swagger.io/terms/")
