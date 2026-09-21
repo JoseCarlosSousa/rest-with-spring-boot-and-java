@@ -42,6 +42,20 @@ services:
         condition: service_healthy
     networks:
       - carlos-network
+  portainer:
+    image: portainer/portainer-ce:latest
+    restart: always
+    ports:
+      - 9000:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - carlos-network
+
+volumes:
+  portainer_data:
+
 networks:
   carlos-network:
     driver: bridge
