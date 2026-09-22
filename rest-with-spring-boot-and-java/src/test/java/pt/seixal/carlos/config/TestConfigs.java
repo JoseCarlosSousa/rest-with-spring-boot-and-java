@@ -2,7 +2,7 @@ package pt.seixal.carlos.config;
 
 public interface TestConfigs {
 
-	// int SERVER_PORT = 80; // 8888;
+	// int SERVER_PORT = 80; // 8888; set in dynamicPort
 
 	String HEADER_PARAM_AUTHORIZATION = "Authorization";
 	String HEADER_PARAM_ORIGIN = "Origin";

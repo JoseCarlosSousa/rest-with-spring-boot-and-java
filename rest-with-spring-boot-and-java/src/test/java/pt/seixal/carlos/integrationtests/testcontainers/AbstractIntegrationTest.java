@@ -31,7 +31,7 @@ import pt.seixal.carlos.data.dto.v1.security.TokenDTO;
 public abstract class AbstractIntegrationTest {
 
 	@LocalServerPort
-	protected int dynamicPort;
+	protected int dynamicPort = 8080;
 
 	protected static String sharedAccessToken;
 	protected static String refreshAccessToken;

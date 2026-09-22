@@ -1,35 +1,46 @@
-name: Continus integration and delivery with github actions
+name: Continuous Integration and Delivery with GitHub Actions
 
 on:
   push:
     branches:
       - "main"
 
+# Permissões obrigatórias para a autenticação OIDC (Workload Identity) funcionar
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
+
+    # 1. Autenticação no Docker Hub (Mantido do seu ficheiro original)
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
+    # 2. Autenticação na Google Cloud via OIDC (Substitui as credenciais da AWS)
+    - name: Authenticate to Google Cloud
+      id: auth
+      uses: google-github-actions/auth@v2
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
-    
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v2
-      
+        workload_identity_provider: 'projects/892010173943/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+        service_account: 'github-actions@://gserviceaccount.com'
+#us-central1-docker.pkg.dev/cursojava2026-509409/carlos-registry
+    # 3. Configurar a CLI do gcloud e autenticar o Docker na Google Cloud
+    - name: Set up Cloud SDK and Configure Docker
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Configure Docker for Google Artifact Registry
+      run: |
+        gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+
+    # 4. Setup do Java e Build do Projeto (Mantido igual)
     - name: Setup Java 21
       uses: actions/setup-java@v5
       with:
@@ -37,6 +48,8 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
+    # Certifique-se de que a propriedade url no seu application.yml usa a variável JDBC_URL_GOOGLE no build
+    # Se precisar de passar variáveis de ambiente para os testes do Maven:
     - name: Build Application .jar
       working-directory: rest-with-spring-boot-and-java
       run: mvn clean package
@@ -45,37 +58,30 @@ jobs:
       working-directory: .
       run: docker compose build
 
-    - name: Tag and Push Docker Image to Amazon Container Registry - ECR
+    # 5. Tag e Push para o Google Artifact Registry (Substitui o ECR da AWS)
+    # Substitua 'us-central1-docker.pkg.dev/cursojava2026-509409/meu-repositorio/curso-java' pela URL do seu Artifact Registry
+    - name: Tag and Push Docker Image to Google Artifact Registry
       run: |
-        docker tag ${{ secrets.DOCKER_USERNAME }}/curso-java:latest ${{ secrets.IMAGE_REPO_URL }}:latest
-        docker tag ${{ secrets.DOCKER_USERNAME }}/curso-java:latest ${{ secrets.IMAGE_REPO_URL }}:${{ github.run_id }}
+        docker tag ${{ secrets.DOCKER_USERNAME }}/curso-java:latest us-central1-docker.pkg.dev/cursojava2026-509409/meu-repositorio/curso-java:latest
+        docker tag ${{ secrets.DOCKER_USERNAME }}/curso-java:latest us-central1-docker.pkg.dev/cursojava2026-509409/meu-repositorio/curso-java:${{ github.run_id }}
         
-        docker push ${{ secrets.IMAGE_REPO_URL }}:latest
-        docker push ${{ secrets.IMAGE_REPO_URL }}:${{ github.run_id }}
-      
-    - name: Download task definition
-      run: |
-        aws ecs describe-task-definition --task-definition ${{ secrets.TASK_DEFINITION_NAME }} --query taskDefinition > task-definition.json
-        
-    - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: task-definition.json
-        container-name: ${{ secrets.CONTAINER_NAME }}
-        image: ${{ secrets.IMAGE_REPO_URL }}:latest
+        docker push us-central1-docker.pkg.dev/cursojava2026-509409/meu-repositorio/curso-java:latest
+        docker push us-central1-docker.pkg.dev/cursojava2026-509409/meu-repositorio/curso-java:${{ github.run_id }}
 
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+    # 6. Deploy no Google Cloud Run (Substitui o ECS/Task Definition da AWS)
+    - name: Deploy to Cloud Run
+      uses: google-github-actions/deploy-cloudrun@v2
       with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ secrets.SERVICE_NAME }}
-        cluster: ${{ secrets.CLUSTER_NAME }}
-        wait-for-service-stability: true      
-        
+        service: 'curso-java-service'
+        region: 'us-central1'
+        image: 'us-central1-docker.pkg.dev/cursojava2026-509409/meu-repositorio/curso-java:latest'
+        # Adiciona a variável da base de dados para a aplicação Java rodar na nuvem
+        env_vars: |
+          JDBC_URL_GOOGLE=jdbc:mysql://34.135.204.81:3306/google_db?useTimezone=true&serverTimezone=UTC
+
+    # 7. Push para o Docker Hub (Mantido do seu original)
     - name: Push to Docker Hub Container Registry
       run: |
         docker tag ${{ secrets.DOCKER_USERNAME }}/curso-java:latest ${{ secrets.DOCKER_USERNAME }}/curso-java:${{ github.run_id }}
         docker push ${{ secrets.DOCKER_USERNAME }}/curso-java:latest
         docker push ${{ secrets.DOCKER_USERNAME }}/curso-java:${{ github.run_id }}
-
