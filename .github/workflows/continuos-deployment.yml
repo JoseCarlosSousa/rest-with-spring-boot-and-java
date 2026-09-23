@@ -5,7 +5,6 @@ on:
     branches:
       - "main"
 
-# Permissões obrigatórias para a autenticação OIDC (Workload Identity) funcionar
 permissions:
   id-token: write
   contents: read
@@ -17,14 +16,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # 1. Autenticação no Docker Hub
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
 
-    # 2. Autenticação na Google Cloud via OIDC (Corrigido o e-mail inválido)
     - name: Authenticate to Google Cloud
       id: auth
       uses: google-github-actions/auth@v2
@@ -32,7 +29,6 @@ jobs:
         workload_identity_provider: 'projects/892010173943/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
         service_account: 'github-actions@://gserviceaccount.com'
 
-    # 3. Configurar a CLI do gcloud e autenticar o Docker na Google Cloud
     - name: Set up Cloud SDK and Configure Docker
       uses: google-github-actions/setup-gcloud@v2
 
@@ -40,7 +36,6 @@ jobs:
       run: |
         gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
-    # 4. Setup do Java e Build do Projeto
     - name: Setup Java 21
       uses: actions/setup-java@v5
       with:
@@ -56,7 +51,6 @@ jobs:
       working-directory: .
       run: docker compose build
 
-    # 5. Tag e Push para o Google Artifact Registry (Corrigido com o teu 'carlos-registry')
     - name: Tag and Push Docker Image to Google Artifact Registry
       run: |
         docker tag ${{ secrets.DOCKER_USERNAME }}/curso-java:latest us-central1-docker.pkg.dev/cursojava2026-509409/carlos-registry/curso-java:latest
@@ -65,7 +59,6 @@ jobs:
         docker push us-central1-docker.pkg.dev/cursojava2026-509409/carlos-registry/curso-java:latest
         docker push us-central1-docker.pkg.dev/cursojava2026-509409/carlos-registry/curso-java:${{ github.run_id }}
 
-    # 6. Deploy no Google Cloud Run (Corrigido o caminho da imagem)
     - name: Deploy to Cloud Run
       uses: google-github-actions/deploy-cloudrun@v2
       with:
@@ -75,7 +68,6 @@ jobs:
         env_vars: |
           JDBC_URL_GOOGLE=jdbc:mysql://34.135.204.81:3306/google_db?useTimezone=true&serverTimezone=UTC
 
-    # 7. Push para o Docker Hub
     - name: Push to Docker Hub Container Registry
       run: |
         docker tag ${{ secrets.DOCKER_USERNAME }}/curso-java:latest ${{ secrets.DOCKER_USERNAME }}/curso-java:${{ github.run_id }}
