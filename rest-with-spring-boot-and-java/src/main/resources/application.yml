@@ -48,7 +48,12 @@ spring:
     #password: ${SPRING_DATASOURCE_PASSWORD:rootroot}
     #password: ${SPRING_DATASOURCE_PASSWORD:Admin123}
     password: ${SPRING_DATASOURCE_PASSWORD:Admin@123}
-  
+
+#GOOGLE CLOUD
+#Adicione as duas variáveis de ambiente para o CORS não barrar o swagger
+#SPRINGDOC_OPENAPI_DEV_SERVER_URL https://run.app
+#SERVER_FORWARD_HEADERS_STRATEGY framework
+
   flyway:
     enabled: true
     locations: classpath:db/migration
