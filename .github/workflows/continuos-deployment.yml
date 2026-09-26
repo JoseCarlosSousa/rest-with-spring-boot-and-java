@@ -25,7 +25,10 @@ jobs:
     - name: Authenticate to Google Cloud
       uses: 'google-github-actions/auth@v2'
       with:
-        credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+        workload_identity_provider: 'projects/892010173943/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+        service_account: 'jccsdeveloper@gmail.com@://gserviceaccount.com'   
+        #credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+
 
     - name: Configure Docker Authentication for Google Cloud Artifact Registry
       run: gcloud auth configure-docker us-central1-docker.pkg.dev
